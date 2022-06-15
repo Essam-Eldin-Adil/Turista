@@ -1,0 +1,77 @@
+﻿@model Turista.Data.Identity.User
+<form action="~/Accounts/CompleteProfile" class="w-100 was-validated" method="post" autocomplete="off" id="complete_form">
+    <div class="text-danger col-12" id="error"></div>
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <input type="hidden" asp-for="UserName" />
+    @if (string.IsNullOrEmpty(Model.FirstName))
+    {
+        <div class="col-12 form-group">
+            <label for="password">@lang.Name:</label>
+            <input type="text" id="FirstName" name="FirstName" class="form-control required" required value="" placeholder="@lang.EnterYourFirstName">
+        </div>
+    }
+    else
+    {
+        <input type="hidden" name="FirstName" value="@Model.FirstName">
+    }
+    @*@if (string.IsNullOrEmpty(Model.LastName))
+    {
+        <div class="col-12 form-group">
+            <label for="password">@lang.LastName:</label>
+            <input type="text" id="LastName" name="LastName" class="form-control required" value="" placeholder="@lang.EnterYourLastName">
+        </div>
+    }
+    else
+    {
+        <input type="hidden" name="LastName" value="@Model.LastName">
+    }*@
+
+    @if (string.IsNullOrEmpty(Model.WhatsAppNumber))
+    {
+
+<div class="col-12 form-group">
+    <label for="password">@lang.WhatsAppNumber:</label>
+    <label>
+        <input type="checkbox" name="SamePhoneNumber" onchange="CheclWhatsappNumber(this)" />
+        @lang.SamePhoneNumber
+    </label>
+    <div class="input-group">
+        <select class="custom-select required" name="key" id="key" style="max-width: 80px;">
+            <option value="+218">+218</option>
+        </select>
+        <input type="text" id="WhatsAppNumber" autocomplete="off" max="9" min="9" name="WhatsAppNumber" class="form-control required" value="" placeholder="@lang.EnterYourWhatsAppNumber">
+    </div>
+</div>
+    }
+    else
+    {
+        <input type="hidden" id="WhatsAppNumber" name="WhatsAppNumber" value="@Model.LastName">
+    }
+<div class="col-12 form-group">
+    <label for="password">@lang.Password:</label>
+    <div class="input-group">
+        <input type="password" id="password" name="Password" class="form-control required" required value="" placeholder="@lang.EnterYourPassword">
+        <div class="input-group-prepend">
+            <span class="password-showhide">
+                <button type="button" onclick="showHidePassword(this)" class="show-password btn btn-link">@lang.Show</button>
+                <button type="button" onclick="showHidePassword(this)" class="hide-password btn btn-link">@lang.Hide</button>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="col-12 form-group">
+    <label for="password">@lang.ConfirmPassword:</label>
+    <div class="input-group">
+        <input type="password" id="confirmedPassword" class="form-control required" required value="" placeholder="@lang.ConfirmPassword">
+        <div class="input-group-prepend">
+            <span class="password-showhide">
+                <button type="button" onclick="showHideConfirmPassword(this)" class="show-password btn btn-link">@lang.Show</button>
+                <button type="button" onclick="showHideConfirmPassword(this)" class="hide-password btn btn-link">@lang.Hide</button>
+            </span>
+        </div>
+    </div>
+</div>
+    <div class="col-12 form-group">
+        <button class="button button-3d button-black m-0" onclick="CompleteProfile()" type="button" id="login-button" name="login-form-submit">@lang.Save</button>
+    </div>
+</form>

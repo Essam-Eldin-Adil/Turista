@@ -1,0 +1,347 @@
+﻿@model PoliciesViewModel
+@{
+    ViewData["Title"] = lang.ReserveCondetionAndPolicy;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@section css{
+}
+
+<div class="tabs tabs-bb clearfix" id="tab-9">
+
+    <ul class="tab-nav clearfix">
+        <li><a href="#forAllTab">@lang.AllProperty</a></li>
+        <li><a href="#chaletTab">@lang.ChaletUtilities</a></li>
+        <li><a href="#resetTab">@lang.ResetUtilities</a></li>
+        <li><a href="#villsTab">@lang.VillsUtilities</a></li>
+    </ul>
+
+    <div class="tab-container">
+        <div class="tab-content clearfix" id="forAllTab">
+            <button type="button" onclick="addPolicy(@((int)enums.PropertyType.All))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddPolicy</button>
+            <button type="button" onclick="newTerm(@((int)enums.PropertyType.All))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTerm</button>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.CancellationPolicies</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Policy</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CancellationPolicies.Where(c => c.PropertyType == (int)enums.PropertyType.All))
+                    {
+                        <tr>
+                            <th>@item.Policy</th>
+                            <th>
+                                <button type="button" onclick="updatePolicy('@item.Id', '@item.Policy',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveCancellationPolicy" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.CancellationPolicies.Any(c => c.PropertyType == (int)enums.PropertyType.All))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.BookingTerms</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Term</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BookingTerms.Where(c => c.PropertyType == (int)enums.PropertyType.All))
+                    {
+                        <tr>
+                            <th>@item.Term</th>
+                            <th>
+                                <button type="button" onclick="updateTerm('@item.Id', '@item.Term',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveBookingTerm" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.BookingTerms.Any(c => c.PropertyType == (int)enums.PropertyType.All))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-content clearfix" id="chaletTab">
+            <button type="button" onclick="addPolicy(@((int)enums.PropertyType.Chalets))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddPolicy</button>
+            <button type="button" onclick="newTerm(@((int)enums.PropertyType.Chalets))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTerm</button>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.CancellationPolicies</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Policy</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CancellationPolicies.Where(c => c.PropertyType == (int)enums.PropertyType.Chalets))
+                    {
+                        <tr>
+                            <th>@item.Policy</th>
+                            <th>
+                                <button type="button" onclick="updatePolicy('@item.Id', '@item.Policy',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveCancellationPolicy" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.CancellationPolicies.Any(c => c.PropertyType == (int)enums.PropertyType.Chalets))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.BookingTerms</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Term</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BookingTerms.Where(c => c.PropertyType == (int)enums.PropertyType.Chalets))
+                    {
+                        <tr>
+                            <th>@item.Term</th>
+                            <th>
+                                <button type="button" onclick="updateTerm('@item.Id', '@item.Term',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveBookingTerm" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.BookingTerms.Any(c => c.PropertyType == (int)enums.PropertyType.Chalets))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-content clearfix" id="resetTab">
+            <button type="button" onclick="addPolicy(@((int)enums.PropertyType.Rest))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddPolicy</button>
+            <button type="button" onclick="newTerm(@((int)enums.PropertyType.Rest))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTerm</button>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.CancellationPolicies</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Policy</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CancellationPolicies.Where(c => c.PropertyType == (int)enums.PropertyType.Rest))
+                    {
+                        <tr>
+                            <th>@item.Policy</th>
+                            <th>
+                                <button type="button" onclick="updatePolicy('@item.Id', '@item.Policy',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveCancellationPolicy" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.CancellationPolicies.Any(c => c.PropertyType == (int)enums.PropertyType.Rest))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.BookingTerms</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Term</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BookingTerms.Where(c => c.PropertyType == (int)enums.PropertyType.Rest))
+                    {
+                        <tr>
+                            <th>@item.Term</th>
+                            <th>
+                                <button type="button" onclick="updateTerm('@item.Id', '@item.Term',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveBookingTerm" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.BookingTerms.Any(c => c.PropertyType == (int)enums.PropertyType.Rest))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-content clearfix" id="villsTab">
+            <button type="button" onclick="addPolicy(@((int)enums.PropertyType.Villa))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddPolicy</button>
+            <button type="button" onclick="newTerm(@((int)enums.PropertyType.Villa))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTerm</button>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.CancellationPolicies</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Policy</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CancellationPolicies.Where(c => c.PropertyType == (int)enums.PropertyType.Villa))
+                    {
+                        <tr>
+                            <th>@item.Policy</th>
+                            <th>
+                                <button type="button" onclick="updatePolicy('@item.Id', '@item.Policy',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveCancellationPolicy" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.CancellationPolicies.Any(c => c.PropertyType == (int)enums.PropertyType.Villa))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2">@lang.BookingTerms</th>
+                    </tr>
+                    <tr>
+                        <th>@lang.Term</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BookingTerms.Where(c => c.PropertyType == (int)enums.PropertyType.Villa))
+                    {
+                        <tr>
+                            <th>@item.Term</th>
+                            <th>
+                                <button type="button" onclick="updateTerm('@item.Id', '@item.Term',@item.PropertyType)" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                <a asp-action="RemoveBookingTerm" asp-route-id="@item.Id" class="btn btn-danger btn-sm"><i class="icon-remove"></i> @lang.Delete</a>
+                            </th>
+                        </tr>
+                    }
+                    @if (!Model.BookingTerms.Any(c => c.PropertyType == (int)enums.PropertyType.Villa))
+                    {
+                        <tr>
+                            <th colspan="2">@lang.NoData</th>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="policyModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SaveCancellationPolicy" method="post" class="was-validated modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">@lang.AddNewField</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="CancellationPolicy.Id" />
+                    <input type="hidden" asp-for="CancellationPolicy.PropertyType" />
+                    <div class="form-group">
+                        <label asp-for="CancellationPolicy.Policy">@lang.Policy</label>
+                        <textarea rows="5" asp-for="CancellationPolicy.Policy" class="form-control" required=""></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="termModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SaveBookingTerm" method="post" class="was-validated modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">@lang.AddNewField</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="BookingTerm.Id" />
+                    <input type="hidden" asp-for="BookingTerm.PropertyType" />
+                    <div class="form-group">
+                        <label asp-for="BookingTerm.Term">@lang.Term</label>
+                        <textarea rows="5" asp-for="BookingTerm.Term" class="form-control" required=""></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section js
+{
+    <script>
+        function addPolicy(propType) {
+            $("#CancellationPolicy_PropertyType").val(propType);
+            $("#CancellationPolicy_Id").val("");
+            $("#CancellationPolicy_Policy").val("");
+            $("#policyModel").modal("show");
+        }
+
+        function updatePolicy(id, policy, propType) {
+            $("#CancellationPolicy_Id").val(id);
+            $("#CancellationPolicy_PropertyType").val(propType);
+            $("#CancellationPolicy_Policy").val(policy);
+            $("#policyModel").modal("show");
+        }
+
+        function newTerm(propType) {
+            $("#BookingTerm_Id").val("");
+            $("#BookingTerm_PropertyType").val(propType);
+            $("#BookingTerm_Term").val("");
+            $("#termModel").modal("show");
+        }
+        function updateTerm(id,term, propType) {
+            $("#BookingTerm_Id").val(id);
+            $("#BookingTerm_PropertyType").val(propType);
+            $("#BookingTerm_Term").val(term);
+            $("#termModel").modal("show");
+        }
+    </script>
+}

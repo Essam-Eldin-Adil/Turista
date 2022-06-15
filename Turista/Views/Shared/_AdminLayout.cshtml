@@ -1,0 +1,328 @@
+﻿<!DOCTYPE html>
+<html dir="@HttpContextAccessor.HttpContext?.Session.GetString("LanguageDirection")" lang="@HttpContextAccessor.HttpContext?.Session.GetString("Language")">
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="SemiColonWeb" />
+
+    <!-- Stylesheets
+    ============================================= -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap" rel="stylesheet" type="text/css" />
+    @if (HttpContextAccessor.HttpContext?.Session.GetString("LanguageName") == lang.Arabic)
+    {
+        <link rel="stylesheet" href="~/css/bootstrap-rtl.css" type="text/css" />
+
+        <link rel="stylesheet" href="~/style-rtl.css" type="text/css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/css/bootstrap.css" type="text/css" />
+
+        <link rel="stylesheet" href="~/style.css" type="text/css" />
+    }
+    <link rel="stylesheet" href="~/demos/real-estate/css/font-icons.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/dark.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/swiper.css" type="text/css" />
+
+    <!-- Crowdfunding Demo Specific Stylesheet -->
+    <link rel="stylesheet" href="~/demos/crowdfunding/crowdfunding.css" type="text/css" />
+    <!-- / -->
+
+    <link rel="stylesheet" href="~/css/font-icons.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/animate.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/magnific-popup.css" type="text/css" />
+
+    @if (HttpContextAccessor.HttpContext?.Session.GetString("LanguageName") == lang.Arabic)
+    {
+        <link rel="stylesheet" href="~/css/custom-rtl.css" type="text/css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/css/custom.css" type="text/css" />
+    }
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="~/css/fonts.css" rel="stylesheet" />
+    <link href="~/alerts.css" rel="stylesheet" />
+    <!-- Document Title
+    ============================================= -->
+    <title>@ViewBag.Title - @Domain.Settings.Get(context).AppName</title>
+</head>
+
+<body class="stretched">
+
+    <!-- Document Wrapper
+    ============================================= -->
+    <div id="wrapper" class="clearfix">
+        <partial name="_headerAmin" />
+
+        <section id="content">
+            <div class="content-wrap p-0 mt-5">
+                <div class="container">
+                    @if (TempData.ContainsKey("AlertType") && TempData.ContainsKey("AlertMessage"))
+                    {
+                        <div class="style-msg @TempData["AlertType"].ToString()msg">
+                            <div class="sb-msg"><i class="icon-thumbs-up"></i><strong>@TempData["AlertTitle"].ToString()</strong> @TempData["AlertMessage"].ToString().</div>
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        </div>
+                    }
+                    @RenderBody()
+                </div>
+            </div>
+            </section>
+
+                <!-- Footer
+        ============================================= -->
+                <footer id="footer" class="dark" style="background-color: #373D52">
+
+                    <!-- Copyrights
+            ============================================= -->
+                    <div id="copyrights">
+                        <div class="container">
+
+                            <div class="row justify-content-between align-items-center">
+                                <div class="col-md-6">
+                                    Copyrights &copy; 2014 All Rights Reserved by Canvas Inc.
+                                </div>
+
+                                <div class="col-md-6 d-md-flex flex-md-column align-items-md-end mt-4 mt-md-0">
+                                    <div class="copyrights-menu copyright-links">
+                                        <a href="#">About</a>/<a href="#">Features</a>/<a href="#">FAQs</a>/<a href="#">Contact</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!-- #copyrights end -->
+                </footer><!-- #footer end -->
+
+            </div><!-- #wrapper end -->
+            <!-- Go To Top
+    ============================================= -->
+            <div id="gotoTop" class="icon-line-arrow-up"></div>
+
+            <!-- JavaScripts
+    ============================================= -->
+            <script src="~/js/jquery.js"></script>
+            <script src="~/js/plugins.min.js"></script>
+            <script src="~/js/components/bs-datatable.js"></script>
+
+            <!-- Footer Scripts
+    ============================================= -->
+            <script src="~/js/functions.js"></script>
+            @if (HttpContextAccessor.HttpContext.Session.GetString("LanguageDirection") == "RTL")
+            {
+                <script>
+                    lang = {
+                        "emptyTable": "ليست هناك بيانات متاحة في الجدول",
+                        "loadingRecords": "جارٍ التحميل...",
+                        "lengthMenu": "أظهر _MENU_ مدخلات",
+                        "zeroRecords": "لم يعثر على أية سجلات",
+                        "info": "إظهار _START_ إلى _END_ من أصل _TOTAL_ مدخل",
+                        "infoEmpty": "يعرض 0 إلى 0 من أصل 0 سجل",
+                        "infoFiltered": "(منتقاة من مجموع _MAX_ مُدخل)",
+                        "search": "ابحث:",
+                        "paginate": {
+                            "first": "الأول",
+                            "previous": "السابق",
+                            "next": "التالي",
+                            "last": "الأخير"
+                        },
+                        "aria": {
+                            "sortAscending": ": تفعيل لترتيب العمود تصاعدياً",
+                            "sortDescending": ": تفعيل لترتيب العمود تنازلياً"
+                        },
+                        "select": {
+                            "rows": {
+                                "_": "%d قيمة محددة",
+                                "1": "1 قيمة محددة"
+                            },
+                            "cells": {
+                                "1": "1 خلية محددة",
+                                "_": "%d خلايا محددة"
+                            },
+                            "columns": {
+                                "1": "1 عمود محدد",
+                                "_": "%d أعمدة محددة"
+                            }
+                        },
+                        "buttons": {
+                            "print": "طباعة",
+                            "copyKeys": "زر <i>ctrl<\/i> أو <i>⌘<\/i> + <i>C<\/i> من الجدول<br>ليتم نسخها إلى الحافظة<br><br>للإلغاء اضغط على الرسالة أو اضغط على زر الخروج.",
+                            "copySuccess": {
+                                "_": "%d قيمة نسخت",
+                                "1": "1 قيمة نسخت"
+                            },
+                            "pageLength": {
+                                "-1": "اظهار الكل",
+                                "_": "إظهار %d أسطر"
+                            },
+                            "collection": "مجموعة",
+                            "copy": "نسخ",
+                            "copyTitle": "نسخ إلى الحافظة",
+                            "csv": "CSV",
+                            "excel": "Excel",
+                            "pdf": "PDF",
+                            "colvis": "إظهار الأعمدة",
+                            "colvisRestore": "إستعادة العرض"
+                        },
+                        "autoFill": {
+                            "cancel": "إلغاء",
+                            "fill": "املأ جميع الحقول بـ <i>%d&lt;\\\/i&gt;<\/i>",
+                            "fillHorizontal": "تعبئة الحقول أفقيًا",
+                            "fillVertical": "تعبئة الحقول عموديا"
+                        },
+                        "searchBuilder": {
+                            "add": "اضافة شرط",
+                            "clearAll": "ازالة الكل",
+                            "condition": "الشرط",
+                            "data": "المعلومة",
+                            "logicAnd": "و",
+                            "logicOr": "أو",
+                            "title": [
+                                "منشئ البحث"
+                            ],
+                            "value": "القيمة",
+                            "conditions": {
+                                "date": {
+                                    "after": "بعد",
+                                    "before": "قبل",
+                                    "between": "بين",
+                                    "empty": "فارغ",
+                                    "equals": "تساوي",
+                                    "not": "ليس",
+                                    "notBetween": "ليست بين",
+                                    "notEmpty": "ليست فارغة"
+                                },
+                                "number": {
+                                    "between": "بين",
+                                    "empty": "فارغة",
+                                    "equals": "تساوي",
+                                    "gt": "أكبر من",
+                                    "gte": "أكبر وتساوي",
+                                    "lt": "أقل من",
+                                    "lte": "أقل وتساوي",
+                                    "not": "ليست",
+                                    "notBetween": "ليست بين",
+                                    "notEmpty": "ليست فارغة"
+                                },
+                                "string": {
+                                    "contains": "يحتوي",
+                                    "empty": "فاغ",
+                                    "endsWith": "ينتهي ب",
+                                    "equals": "يساوي",
+                                    "not": "ليست",
+                                    "notEmpty": "ليست فارغة",
+                                    "startsWith": " تبدأ بـ "
+                                }
+                            },
+                            "button": {
+                                "0": "فلاتر البحث",
+                                "_": "فلاتر البحث (%d)"
+                            },
+                            "deleteTitle": "حذف فلاتر"
+                        },
+                        "searchPanes": {
+                            "clearMessage": "ازالة الكل",
+                            "collapse": {
+                                "0": "بحث",
+                                "_": "بحث (%d)"
+                            },
+                            "count": "عدد",
+                            "countFiltered": "عدد المفلتر",
+                            "loadMessage": "جارِ التحميل ...",
+                            "title": "الفلاتر النشطة"
+                        },
+                        "infoThousands": ",",
+                        "datetime": {
+                            "previous": "السابق",
+                            "next": "التالي",
+                            "hours": "الساعة",
+                            "minutes": "الدقيقة",
+                            "seconds": "الثانية",
+                            "unknown": "-",
+                            "amPm": [
+                                "صباحا",
+                                "مساءا"
+                            ],
+                            "weekdays": [
+                                "الأحد",
+                                "الإثنين",
+                                "الثلاثاء",
+                                "الأربعاء",
+                                "الخميس",
+                                "الجمعة",
+                                "السبت"
+                            ],
+                            "months": [
+                                "يناير",
+                                "فبراير",
+                                "مارس",
+                                "أبريل",
+                                "مايو",
+                                "يونيو",
+                                "يوليو",
+                                "أغسطس",
+                                "سبتمبر",
+                                "أكتوبر",
+                                "نوفمبر",
+                                "ديسمبر"
+                            ]
+                        },
+                        "editor": {
+                            "close": "إغلاق",
+                            "create": {
+                                "button": "إضافة",
+                                "title": "إضافة جديدة",
+                                "submit": "إرسال"
+                            },
+                            "edit": {
+                                "button": "تعديل",
+                                "title": "تعديل السجل",
+                                "submit": "تحديث"
+                            },
+                            "remove": {
+                                "button": "حذف",
+                                "title": "حذف",
+                                "submit": "حذف",
+                                "confirm": {
+                                    "_": "هل أنت متأكد من رغبتك في حذف السجلات %d المحددة؟",
+                                    "1": "هل أنت متأكد من رغبتك في حذف السجل؟"
+                                }
+                            },
+                            "error": {
+                                "system": "حدث خطأ ما"
+                            },
+                            "multi": {
+                                "title": "قيم متعدية",
+                                "restore": "تراجع"
+                            }
+                        },
+                        "processing": "جارٍ المعالجة..."
+                    };
+
+                    function loading() {
+                        $("#loading").fadeIn();
+                    }
+
+                    function stopLoading() {
+                        $("#loading").fadeOut();
+                    }
+
+                    $(document).ajaxStart(function () {
+                        loading();
+                    });
+                    $(document).ajaxComplete(function () {
+                        stopLoading();
+                    });
+                </script>
+            }
+            <!-- ADD-ONS JS FILES -->
+            <script>
+
+
+
+            </script>
+            @RenderSection("js", false)
+            @RenderSection("css", false)
+</body>
+</html>

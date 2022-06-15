@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html dir="@HttpContextAccessor.HttpContext?.Session.GetString("LanguageDirection")" lang="@HttpContextAccessor.HttpContext?.Session.GetString("Language")">
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="SemiColonWeb" />
+
+    <!-- Stylesheets
+    ============================================= -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap" rel="stylesheet" type="text/css" />
+    @if (HttpContextAccessor.HttpContext?.Session.GetString("LanguageName") == lang.Arabic)
+    {
+        <link rel="stylesheet" href="~/css/bootstrap-rtl.css" type="text/css" />
+
+        <link rel="stylesheet" href="~/style-rtl.css" type="text/css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/css/bootstrap.css" type="text/css" />
+
+        <link rel="stylesheet" href="~/style.css" type="text/css" />
+    }
+    <link rel="stylesheet" href="~/css/dark.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/swiper.css" type="text/css" />
+
+    <!-- Crowdfunding Demo Specific Stylesheet -->
+    <link rel="stylesheet" href="~/demos/crowdfunding/crowdfunding.css" type="text/css" />
+    <!-- / -->
+
+    <link rel="stylesheet" href="~/css/font-icons.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/animate.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/magnific-popup.css" type="text/css" />
+
+    @if (HttpContextAccessor.HttpContext?.Session.GetString("LanguageName") == lang.Arabic)
+    {
+        <link rel="stylesheet" href="~/css/custom-rtl.css" type="text/css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/css/custom.css" type="text/css" />
+    }
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="~/css/fonts.css" rel="stylesheet" />
+    <link href="~/alerts.css" rel="stylesheet" />
+    <!-- Document Title
+    ============================================= -->
+    <title>@ViewBag.Title - @Domain.Settings.Get(context).AppName</title>
+</head>
+
+<body class="stretched">
+
+    <!-- Document Wrapper
+    ============================================= -->
+    <div id="wrapper" class="clearfix">
+        <partial name="_headerPropertyUser" />
+
+        <div class="pb-5">
+            <div class="container pt-2">
+                @if (TempData.ContainsKey("AlertType") && TempData.ContainsKey("AlertMessage"))
+                {
+                    <div class="style-msg @TempData["AlertType"].ToString()msg">
+                        <div class="sb-msg"><i class="icon-thumbs-up"></i><strong>@TempData["AlertTitle"].ToString()</strong> @TempData["AlertMessage"].ToString().</div>
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    </div>
+                }
+            </div>
+            @RenderBody()
+        </div>
+
+        <!-- Footer
+        ============================================= -->
+        <footer id="footer" class="dark" style="background-color: #373D52">
+
+            <!-- Copyrights
+            ============================================= -->
+            <div id="copyrights">
+                <div class="container">
+
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-md-6">
+                            Copyrights &copy; 2014 All Rights Reserved by Canvas Inc.
+                        </div>
+
+                        <div class="col-md-6 d-md-flex flex-md-column align-items-md-end mt-4 mt-md-0">
+                            <div class="copyrights-menu copyright-links">
+                                <a href="#">About</a>/<a href="#">Features</a>/<a href="#">FAQs</a>/<a href="#">Contact</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div><!-- #copyrights end -->
+        </footer><!-- #footer end -->
+
+    </div><!-- #wrapper end -->
+    <!-- Go To Top
+    ============================================= -->
+    <div id="gotoTop" class="icon-line-arrow-up"></div>
+
+    <!-- JavaScripts
+    ============================================= -->
+    <script src="~/js/jquery.js"></script>
+    <script src="~/js/plugins.min.js"></script>
+
+    <!-- Footer Scripts
+    ============================================= -->
+    <script src="~/js/functions.js"></script>
+
+    <!-- ADD-ONS JS FILES -->
+    <script>
+
+
+
+    </script>
+    @RenderSection("js", false)
+    @RenderSection("css", false)
+</body>
+</html>

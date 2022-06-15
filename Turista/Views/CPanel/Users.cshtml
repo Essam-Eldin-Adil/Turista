@@ -1,0 +1,243 @@
+﻿@model Turista.Data.Identity.User
+@{
+    ViewData["Title"] = lang.UserManagement;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h4>@lang.UserManagement</h4>
+
+
+<input type="hidden" id="userType" value="@((int)enums.UserType.Admin)" />
+<button type="button" onclick="addUser()" class="btn btn-success btn-sm"><i class="icon-plus"></i> @lang.AddUser</button>
+<div class="col-12 form-group mt-4">
+    <label for="website-cost-cms" class="mb-3">@lang.UsersType</label><br>
+    <div class="btn-group btn-group-toggle flex-wrap w-100" data-toggle="buttons">
+        <label for="r1" class="btn btn-outline-success px-4 font-weight-semibold ls0 nott">
+            <input type="radio" id="r1" checked="" onclick="setUserType($(this).val())" value="@((int)enums.UserType.Admin)"> <i class="icon-user-cog"></i> @lang.SystemAdmin
+        </label>
+        <label for="r2" class="btn btn-outline-success px-4 font-weight-semibold ls0 nott">
+            <input type="radio" id="r2" onclick="setUserType($(this).val())" value="@((int)enums.UserType.BookAdmin)"> <i class="icon-user-circle1"></i> @lang.BookingAdmin
+        </label>
+        <label for="r3" class="btn btn-outline-success px-4 font-weight-semibold ls0 nott">
+            <input type="radio" id="r3" onclick="setUserType($(this).val())" value="@((int)enums.UserType.EndUser)"> <i class="icon-user"></i> @lang.EndUser
+        </label>
+    </div>
+</div>
+<div class="table-responsive mt-3">
+    <table id="datatable1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>@lang.FirstName</th>
+                <th>@lang.LastName</th>
+                <th>@lang.Email</th>
+                <th>@lang.PhoneNumber</th>
+                <th>@lang.WhatsAppNumber</th>
+                <th>@lang.Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>@lang.FirstName</th>
+                <th>@lang.LastName</th>
+                <th>@lang.Email</th>
+                <th>@lang.PhoneNumber</th>
+                <th>@lang.WhatsAppNumber</th>
+                <th>@lang.Status</th>
+                <th></th>
+            </tr>
+        </tfoot>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SaveUser" method="post" class="was-validated modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">@lang.AddUser</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <label asp-for="FirstName">@lang.FirstName</label>
+                        <input type="text" asp-for="FirstName" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LastName">@lang.LastName</label>
+                        <input type="text" asp-for="LastName" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Email">@lang.Email</label>
+                        <input type="text" asp-for="Email" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber">@lang.PhoneNumber</label>
+                        <input type="text" asp-for="PhoneNumber" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="WhatsAppNumber">@lang.WhatsAppNumber</label>
+                        <input type="text" asp-for="WhatsAppNumber" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="UserType">@lang.UserType</label>
+                        <select asp-for="UserType" class="form-control" required="">
+                            <option value="" selected="">@lang.PleaseSelect</option>
+                            <option value="@((int)enums.UserType.Admin)">@lang.SystemAdmin</option>
+                            <option value="@((int)enums.UserType.BookAdmin)">@lang.BookingAdmin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@section js
+{
+    <script>
+        var oTable;
+        function initDataTable() {
+            oTable = $('#datatable1').dataTable({
+                "ajax": '@Url.Action("GetData")?userType='+$("#userType").val(),
+                language: lang,
+                length: true,
+                data: { userType : $("#userType").val()},
+                serverSide: true,
+                retrieve: true,
+                dom: 'Bfrtip',
+                columns: [
+                    {
+                        "data": "firstName",
+                        "render": function(data, type, full, meta) {
+                            if (data) {
+
+                                return data;
+                            } else {
+                                return `--`;
+                            }
+                        }
+                    },
+                    {
+                        "data": "lastName",
+                        "render": function(data, type, full, meta) {
+                            if (data) {
+
+                                return data;
+                            } else {
+                                return `--`;
+                            }
+                        }
+                    },
+                    {
+                        "data": "email",
+                        "render": function(data, type, full, meta) {
+                            if (data) {
+
+                                return data;
+                            } else {
+                                return `--`;
+                            }
+                        }
+                    },
+                    {
+                        "data": "phoneNumber",
+                        "render": function(data, type, full, meta) {
+                            if (data) {
+
+                                return data;
+                            } else {
+                                return `--`;
+                            }
+                        }
+                    },
+                    {
+                        "data": "whatsAppNumber",
+                        "render": function(data, type, full, meta) {
+                            if (data) {
+
+                                return data;
+                            } else {
+                                return `--`;
+                            }
+                        }
+                    },
+                    {
+                        "data": "phoneNumberConfirmed",
+                        "className": "text-center",
+                        "render": function(data, type, full, meta) {
+                            // console.log(full.status.number);
+                            if (data == true) {
+                                return `<span class="badge badge-success">@lang.Active</span>`;
+                            } else {
+                                return `<span class="badge badge-danger">@lang.Inactive</span>`;
+                            }
+                        }
+                    },
+                    {
+                        "data": "id",
+                        "className": "text-center w-25",
+                        "render": function(data, type, full, meta) {
+                            console.log(full);
+                            return `<button onclick="updateUser('${full.id}','${full.firstName}','${full.lastName}','${full.email}','${full.phoneNumber}','${full.whatsAppNumber}',${full.userType})" type="button" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                    <a href="@Url.Action("RemoveUser")/${full.id}" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>`;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function reloadDataTable() {
+            //oTable.fnClearTable();
+
+            oTable.fnDestroy();
+            initDataTable();
+            console.log("AutoReload");
+        }
+
+        $(document).ready(function() {
+            initDataTable();
+        });
+
+        function updateUser(id, firstName, lastName, email, phoneNumber, whatsAppNumber, userType) {
+            $("#myModalLabel").html('@lang.UserEdit :' + firstName);
+            $("#Id").val(id);
+            $("#FirstName").val(firstName);
+            $("#LastName").val(lastName);
+            $("#Email").val(email);
+            $("#PhoneNumber").val(phoneNumber);
+            $("#WhatsAppNumber").val(whatsAppNumber);
+            $("#UserType").val(userType);
+            $("#myModal").modal("show");
+        }
+
+        function addUser() {
+            $("#myModalLabel").html('@lang.AddUser');
+            $("#Id").val("");
+            $("#FirstName").val("");
+            $("#LastName").val("");
+            $("#Email").val("");
+            $("#PhoneNumber").val("");
+            $("#WhatsAppNumber").val("");
+            $("#myModal").modal("show");
+        }
+
+        function setUserType(userType) {
+            $("#userType").val(userType);
+            reloadDataTable();
+        }
+
+    </script>
+}

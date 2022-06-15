@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewData["Title"] = lang.Contact;
+}
+
+<section id="page-title" class="page-title-parallax page-title-dark page-title-center include-header include-topbar" style="background: url('@Url.Content("~/demos/real-estate/images/contact/page-title.jpg")') no-repeat center center / cover; padding: 110px 0;" data-center="background-position: 0px -100px;" data-top-bottom="background-position:0px 200px;">
+
+    <div class="container clearfix">
+        <h2 class="text-white">@lang.Contact</h2>
+    </div>
+
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%; z-index:1;">
+        <div class="video-overlay" style="background: rgb(44 62 80 / 88%);"></div>
+    </div>
+
+</section><!-- #page-title end -->
+
+<section id="content">
+    <div class="content-wrap">
+        <div class="container">
+            <partial name="_contact_us" model="Model" />
+        </div>
+    </div>
+</section><!-- #page-title end -->

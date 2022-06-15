@@ -1,0 +1,115 @@
+﻿@model Turista.Data.Properties.Property
+@{
+    var address = Model.City.CityName + ", " + Model.Region + ", " + Model.Neighborhood;
+    var offer = Domain.Reservation.getIsHasOffer(context, HttpContextAccessor.HttpContext, Model);
+    var images = Domain.Properties.GetPropertyImages(context, Model.Id);
+}
+<div class="card mb-3">
+    <div class="grid-inner row">
+        <div class="col-lg-6 col-12">
+            <div id="carousel-@Model.Id" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    @foreach (var item in images)
+                    {
+                        var index = images.IndexOf(item);
+                        if (index == 0)
+                        {
+                            <li data-target="#carousel-@Model.Id" data-slide-to="@index" class="active"></li>
+                        }
+                        else
+                        {
+                            <li data-target="#carousel-@Model.Id" data-slide-to="@index"></li>
+                        }
+                    }
+                </ol>
+                <div class="carousel-inner">
+                    @foreach (var item in images)
+                    {
+                        var index = images.IndexOf(item);
+                        if (index == 0)
+                        {
+                            <a href="~/Home/Unit/@Model.Id" class="carousel-item active">
+                                <img class="d-block w-100" style="height: 200px " src="@Url.Content("~/"+item)" alt="First slide">
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="~/Home/Unit/@Model.Id" class="carousel-item">
+                                    <img class="d-block w-100" style="height: 200px;" src="@Url.Content("~/"+item)" alt="Second slide">
+                            </a>
+                        }
+                    }
+                </div>
+                <a class="carousel-control-prev" href="#carousel-@Model.Id" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel-@Model.Id" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg col-md-6 mt-4 mt-lg-0 py-3">
+            <div class="entry-title title-sm">
+                <h4><a href="~/Home/Unit/@Model.Id">@Html.Raw(Domain.Properties.GetPropertyName(context, Model))</a></h4>
+            </div>
+            <div class="entry-meta">
+                <ul>
+                    <li><i class="icon-eye color"></i><a href="#"> @Model.Views</a></li>
+                    <li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (Model.IsFive)
+                            {
+                                <a href="javascript:void(0)" onclick="fiverate(this,'@Model.Id');" data-toggle="tooltip" title="@lang.Like"><i class="icon-heart text-danger"></i></a>
+                            }
+                            else
+                            {
+                                <a href="javascript:void(0)" onclick="fiverate(this,'@Model.Id');" data-toggle="tooltip" title="@lang.Like"><i class="icon-line-heart"></i></a>
+                            }
+                        }
+                        else
+                        {
+                            <a href="~/Accounts/Login?ReturnUrl=@Context.Request.Path" data-toggle="tooltip" title="@lang.Like"><i class="icon-line-heart"></i></a>
+                        }
+                    </li>
+                    <li>
+                        <i class="icon-line-map"></i>
+                        @if (address.Length > 30)
+                        {
+                            <span style="font-size: 0.8rem;">@address.Substring(0, 30)...</span>
+                        }
+                        else
+                        {
+                            <span style="font-size: 0.8rem;">@address</span>
+                        }
+                    </li>
+                    <li>
+                        <i class="icon-money"></i>
+                        @if (offer.HasOffer)
+                        {
+                            <span>
+                                @lang.Currency <del class="text-danger">@Model.DayPrice</del>
+                                @offer.Amount
+                                <small><em>@lang.DayPrice</em></small>
+                            </span>
+                        }
+                        else
+                        {
+                            <span>
+                                @lang.Currency @Model.DayPrice
+                                <small><em>@lang.DayPrice</em></small>
+                            </span>
+                        }
+                    </li>
+                </ul>
+                @if (Model.IsReserved)
+                {
+
+                    <div class="label badge badge-danger">@lang.PropertyReserved</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

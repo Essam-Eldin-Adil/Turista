@@ -1,0 +1,114 @@
+﻿@model Turista.Data.Resorts.Resort
+
+<form method="post" class="was-validated card rounded-top border-0 w-100" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Order" class="form-control" />
+    <input type="hidden" asp-for="CreatedDate" class="form-control" />
+    <input type="hidden" asp-for="Id" class="form-control" />
+    <input type="hidden" asp-for="Longitude" class="form-control" />
+    <input type="hidden" asp-for="Latitude" class="form-control" />
+    <div class="card-body border-top">
+        <div class="form-row">
+            <div class="form-group col-md-7">
+                <label asp-for="Name" class="control-label">@lang.Name</label>
+                <input class="form-control" asp-for="Name" required />
+            </div>
+            <div class="form-group col-md-5">
+                <label asp-for="ViewStatus" class="control-label">@lang.ViewStatus</label>
+                <select asp-for="ViewStatus" class="form-control">
+                    @if (Model.ViewStatus)
+                    {
+                        <option value="true" selected="selected">@lang.ViewStatusShown</option>
+                        <option value="false">@lang.ViewStatusHidden</option>
+                    }
+                    else
+                    {
+                        <option value="true">@lang.ViewStatusShown</option>
+                        <option value="false" selected="selected">@lang.ViewStatusHidden</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="CityId" class="control-label">@lang.City</label>
+                <select required="" asp-for="CityId" class="form-control" asp-items="ViewBag.Cities">
+                    <option value="" selected="selected">@lang.PleaseSelect</option>
+                </select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="Region" class="control-label">@lang.Region</label>
+                <input asp-for="Region" required="" class="form-control" />
+                <span asp-validation-for="Region" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="Neighborhood" class="control-label">@lang.Neighborhood</label>
+                <input asp-for="Neighborhood" class="form-control" />
+                <span asp-validation-for="Neighborhood" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="Direction" class="control-label">@lang.Direction</label>
+                <select asp-for="Direction" class="form-control">
+                    <option value="" selected>@lang.PleaseSelect</option>
+                    <option value="@((int)enums.Direction.East)">@(lang.East)</option>
+                    <option value="@((int)enums.Direction.West)">@(lang.West)</option>
+                    <option value="@((int)enums.Direction.South)">@(lang.South)</option>
+                    <option value="@((int)enums.Direction.North)">@(lang.North)</option>
+                    <option value="@((int)enums.Direction.Northeast)">@(lang.Northeast)</option>
+                    <option value="@((int)enums.Direction.NorthWest)">@(lang.NorthWest)</option>
+                    <option value="@((int)enums.Direction.Southeast)">@(lang.Southeast)</option>
+                    <option value="@((int)enums.Direction.Southwest)">@(lang.Southwest)</option>
+                </select>
+                <span asp-validation-for="Direction" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="control-label">@lang.CloseToSea</label>
+                <label>
+                    <input type="radio" value="true" onchange="closeToSea(true)" asp-for="CloseToSea" />
+                    @lang.Yes
+                </label>
+                <label>
+                    <input type="radio" value="false" onchange="closeToSea(false)" asp-for="CloseToSea" />
+                    @lang.No
+                </label>
+                <span asp-validation-for="CloseToSea" class="text-danger"></span>
+            </div>
+        </div>
+        @if (Model.CloseToSea)
+        {
+            <div class="form-group" id="seaArea">
+                <label asp-for="DistanceFromSea" class="control-label">@lang.DistanceFromSea</label>
+                <input asp-for="DistanceFromSea" class="form-control" />
+                <span asp-validation-for="DistanceFromSea" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <div class="form-group d-none" id="seaArea">
+                <label asp-for="DistanceFromSea" class="control-label">@lang.DistanceFromSea</label>
+                <input asp-for="DistanceFromSea" class="form-control" />
+                <span asp-validation-for="DistanceFromSea" class="text-danger"></span>
+            </div>
+        }
+
+        <div class="form-group">
+            <label asp-for="Description" class="control-label">@lang.Description</label>
+            <textarea rows="7" asp-for="Description" class="form-control" placeholder="@lang.Description..."></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Location" class="control-label">@lang.Location</label>
+            <input asp-for="Location" class="form-control" />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+        <div id="gmap" style="height:300px"></div>
+
+        <div class="form-group mt-3">
+            <input type="submit" value="@lang.Save" class="btn btn-primary" />
+        </div>
+    </div>
+
+</form>

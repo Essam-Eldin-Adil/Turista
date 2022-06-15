@@ -1,0 +1,52 @@
+﻿@model Turista.Data.Properties.Property
+@{
+    ViewData["Title"] = lang.UtitiltiesAndServices;
+    Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+}
+<section id="content">
+    <div class="content-wrap p-0 mt-5">
+        <div class="container clearfix">
+            <div id="side-navigation" class="row">
+                <div class="col-md-6 col-lg-4">
+                    <partial name="_menu" model="Model" />
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div id="PropertyUtilities">
+                        <div class="heading-block border-0">
+                            <h3>@ViewBag.Title</h3>
+                            @if (!string.IsNullOrEmpty(Model.PropertyName))
+                            {
+                                <span>@Model.PropertyName</span>
+                            }
+                        </div>
+                        <form method="post" id="propertyUtilitiesForm" asp-action="SavePropertyUtilities">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    @section js{
+        <script>
+            $("#propUtil").addClass("ui-tabs-active ui-state-active");
+
+        getPropertyUtilities();
+            function getPropertyUtilities() {
+            $("#propertyUtilitiesForm").html('@Html.Raw(lang.PleaseWait)');
+            var propertyId = '@Model.Id';
+            $.ajax({
+                url: '@Url.Action("GetPropertyUtilities")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: { propertyId: propertyId, propertyType:@Model.PropertyType }
+            }).then(function (content) {
+                $("#propertyUtilitiesForm").html(content);
+                $("#PropertyId").val('@Model.Id');
+            });
+        }
+        </script>
+    }

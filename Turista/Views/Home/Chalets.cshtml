@@ -1,0 +1,73 @@
+﻿@{
+    ViewBag.Title = lang.BestChalet;
+    var type = (int)enums.PropertyType.Chalets;
+
+    var dates = Domain.Reservation.GetCheckedDates(HttpContextAccessor.HttpContext);
+    var dateDesc = "";
+    dates.DaysCount = (dates.CheckOut - dates.CheckIn).Days;
+    @if (dates.DaysCount == 1)
+    {
+        dateDesc = lang.OneNight;
+        dateDesc += " " + dates.CheckIn.ToLongDateString();
+    }
+    else if (dates.DaysCount == 2)
+    {
+        dateDesc = lang.TowNights;
+        dateDesc += " " + lang.From + " " + dates.CheckIn.ToLongDateString() + " " + lang.to + " " + dates.CheckOut.ToLongDateString();
+    }
+    else if (dates.DaysCount > 2 && dates.DaysCount < 10)
+    {
+        dateDesc = dates.DaysCount + " " + lang.Nights;
+        dateDesc += " " + lang.From + " " + dates.CheckIn.ToLongDateString() + " " + lang.to + " " + dates.CheckOut.ToLongDateString();
+    }
+    else
+    {
+        dateDesc = dates.DaysCount + " " + lang.Night;
+        dateDesc += " " + lang.From + " " + dates.CheckIn.ToLongDateString() + " " + lang.to + " " + dates.CheckOut.ToLongDateString();
+    }
+}
+
+@section css{
+    <link href="~/css/jquery-ui.min.css" rel="stylesheet" />
+    <link href="~/css/jquery.comiseo.daterangepicker.css" rel="stylesheet" />
+}
+<!-- Page Title
+        ============================================= -->
+<section id="page-title" class="page-title-parallax page-title-dark page-title-center include-header include-topbar" style="background: url('@Url.Content("~/images/chalets_bg.jpg")') no-repeat center center / cover; padding: 110px 0;" data-center="background-position: 0px -100px;" data-top-bottom="background-position:0px 200px;">
+
+    <div class="container clearfix">
+        <h2 class="text-white">@lang.BestChalet</h2>
+        <h4 class="text-white" id="dateContent">
+            <i class="icon-calendar-1"></i> @dateDesc
+        </h4>
+        <input id="reservedate" name="reservedate" type="hidden">
+        <button style="z-index:300" onclick='$("#reservedate").daterangepicker("open");' type="button" class="button button-circle bg-white text-black-50"><i class="icon-pencil"></i>@lang.EditDate</button>
+    </div>
+
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%; z-index:1;">
+        <div class="video-overlay" style="background: rgb(44 62 80 / 88%);"></div>
+    </div>
+
+</section><!-- #page-title end -->
+<section id="content">
+    <div class="content-wrap">
+        <div class="container">
+            <div id="PropertyContent" class="row">
+                
+            </div>
+            <input type="hidden" id="totalCount" value="@ViewBag.TotalCount" />
+            <input type="hidden" id="currentReview" value="0" />
+            @if (ViewBag.TotalCount > 10)
+            {
+                <button id="loadMoreBtn" onclick="GetDeptProperty(@type)" class="button button-circle w-100">@lang.LoadMore</button>
+            }
+        </div>
+    </div>
+</section>
+
+
+@section js{
+    <script>
+        GetDeptProperty(@((int)enums.PropertyType.Chalets));
+    </script>
+}

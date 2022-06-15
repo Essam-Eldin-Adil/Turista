@@ -1,0 +1,26 @@
+﻿@model Turista.Models.CheckedDates
+@{
+    var dateDesc = "";
+    Model.DaysCount = (Model.CheckOut - Model.CheckIn).Days;
+    if (Model.DaysCount == 1)
+    {
+        dateDesc = lang.OneNight;
+        dateDesc += " " + Model.CheckIn.ToLongDateString();
+    }
+    else if (Model.DaysCount == 2)
+    {
+        dateDesc = lang.TowNights;
+        dateDesc += " " + lang.From + " " + Model.CheckIn.ToLongDateString() + " " + lang.to + " " + Model.CheckOut.ToLongDateString();
+    }
+    else if (Model.DaysCount > 2 && Model.DaysCount < 10)
+    {
+        dateDesc = Model.DaysCount + " " + lang.Nights;
+        dateDesc += " " + lang.From + " " + Model.CheckIn.ToLongDateString() + " " + lang.to + " " + Model.CheckOut.ToLongDateString();
+    }
+    else
+    {
+        dateDesc = Model.DaysCount + " " + lang.Night;
+        dateDesc += " " + lang.From + " " + Model.CheckIn.ToLongDateString() + " " + lang.to + " " + Model.CheckOut.ToLongDateString();
+    }
+}
+<i class="icon-calendar-1"></i> @dateDesc  

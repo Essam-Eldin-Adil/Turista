@@ -1,0 +1,71 @@
+﻿@model Turista.Data.Properties.Property
+@{
+    var address = Model.City.CityName + ", " + Model.Region + ", " + Model.Neighborhood;
+    Domain.Properties.getPropertyPrice(context, Model, DateTime.Now);
+}
+<div class="real-estate-item-image">
+    @if (Model.IsReserved)
+    {
+        <div class="label badge badge-danger">@lang.PropertyReserved</div>
+    }
+    @if (Model.PropertyImages.Any())
+    {
+        <a href="#">
+            <img class="w-100" style="max-height: 300px; min-height: 300px; object-fit: cover" src="@Url.Content("~/"+Model.PropertyImages.FirstOrDefault().File.FileContentMin)" alt="Image 1">
+        </a>    
+    }
+
+    <div class="real-estate-item-price">
+        @Model.DayPrice @lang.Currency<span>@lang.DayPrice</span>
+    </div>
+    <div class="real-estate-item-info clearfix" data-lightbox="gallery">
+        @if (Model.PropertyImages.Any())
+        {
+            <a href="@Url.Content("~/"+Model.PropertyImages.FirstOrDefault().File.FileContent)" data-toggle="tooltip" title="Images" data-lightbox="gallery-item"><i class="icon-line-stack-2"></i></a>
+        }
+        @foreach (var item in Model.PropertyImages)
+        {
+            <a href="@Url.Content("~/"+item.File.FileContent)" class="d-none" data-lightbox="gallery-item"></a>
+        }
+
+        <a href="#" data-toggle="tooltip" title="@lang.Reviews"><i class="icon-eye"></i> @Model.Views</a>
+    </div>
+</div>
+
+    <div class="real-estate-item-desc p-1 mt-0 border">
+        <h5>
+            <a href="~/Home/Unit/@Model.Id">
+                @if (Model.PropertyName.Length > 30)
+                {
+                    <span>@Model.PropertyName.Substring(0, 30)...</span>
+                }
+                else
+                {
+                    <span>@Model.PropertyName</span>
+                }
+            </a>
+        </h5>
+        @if (address.Length > 30)
+        {
+            <span style="font-size: 0.8rem;">@address.Substring(0, 30)...</span>
+        }
+        else
+        {
+            <span style="font-size: 0.8rem;">@address</span>
+        }
+
+        <a href="~/Home/Unit/@Model.Id" class="real-estate-item-link"><i class="icon-info"></i></a>
+        @if (Model.ParameterValues!=null)
+        {
+            <div class="line" style="margin-top: 15px; margin-bottom: 15px;"></div>
+
+            <div class="real-estate-item-features row font-weight-medium font-primary px-3 clearfix">
+                <div class="col-lg-4 col-6 p-0">Beds: <span class="color">3</span></div>
+                <div class="col-lg-4 col-6 p-0">Baths: <span class="color">3</span></div>
+                <div class="col-lg-4 col-6 p-0">Area: <span class="color">150 sqm</span></div>
+                <div class="col-lg-4 col-6 p-0">Pool: <span class="text-success"><i class="icon-check-sign"></i></span></div>
+                <div class="col-lg-4 col-6 p-0">Internet: <span class="text-success"><i class="icon-check-sign"></i></span></div>
+                <div class="col-lg-4 col-6 p-0">Cleaning: <span class="text-danger"><i class="icon-minus-sign-alt"></i></span></div>
+            </div>
+        }
+    </div>

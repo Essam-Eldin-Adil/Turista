@@ -1,0 +1,1829 @@
+﻿@model UtilitiesViewModel
+@{
+    ViewData["Title"] = lang.ParameterManagement;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@section css{
+    <link href="~/css/treeview.css" rel="stylesheet" />
+
+    <style>
+        .toggle-header, .accordion-header {
+            position: relative;
+            display: -ms-flexbox;
+            display: inline;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            margin: 0 0px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 100;
+        }
+
+        .toggle {
+            display: contents !important;
+        }
+
+        ul.icons-list {
+            list-style: none;
+            max-height:300px;
+            overflow:auto
+        }
+
+            ul.icons-list li {
+                float: left;
+                width: 25%;
+                margin-bottom: 20px;
+                font-size: 16px;
+                padding: 0 15px;
+                cursor:pointer
+            }
+
+                ul.icons-list li i {
+                    position: relative;
+                    top: 5px;
+                    margin-right: 20px;
+                    width: 24px;
+                    height: 24px;
+                    line-height: 24px;
+                    text-align: center;
+                    font-size: 24px;
+                    display:block
+                }
+
+                ul.icons-list li:active {
+                    border:solid 1px #000
+                }
+    </style>
+}
+
+<div class="tabs tabs-bb clearfix" id="tab-9">
+
+    <ul class="tab-nav clearfix">
+        <li><a href="#forAllTab">@lang.AllProperty</a></li>
+        <li><a href="#chaletTab">@lang.ChaletUtilities</a></li>
+        <li><a href="#resetTab">@lang.ResetUtilities</a></li>
+        <li><a href="#villsTab">@lang.VillsUtilities</a></li>
+        <li><a href="#resortTab">@lang.ResortUtilities</a></li>
+    </ul>
+
+    <div class="tab-container">
+        <div class="tab-content clearfix" id="forAllTab">
+            <button type="button" onclick="newMenu(@((int)enums.PropertyType.All))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewMenu</button>
+            <ul id="myUL" class="list-group">
+                @foreach (var item in Model.ItemTree.Where(c => c.Type == (int)enums.PropertyType.All))
+                {
+                    <li class="list-group-item">
+                        <span class="btn icon-line-square-plus"></span>
+                        <i class="@item.ParameterGroup.Icon"></i>
+                        @item.ParameterGroup.Name
+                        <ul class="nested">
+                            <li>
+
+                                <button onclick="updateMyMenu('@item.ParameterGroup.Id', '@item.ParameterGroup.Name', '@item.ParameterGroup.Filterable', @item.ParameterGroup.PropertyType, '@item.ParameterGroup.Icon')" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                <button type="button" onclick="newSubMenu('@item.ParameterGroup.Id',@item.ParameterGroup.PropertyType)" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewSubMenu</button>
+                                <button type="button" onclick="newParameter('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                <button type="button" onclick="addGroupTranslation('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                            </li>
+                            @if (item.HaveNodes)
+                            {
+                                <li>
+                                    <h5 class="mb-1">@lang.SubGroups</h5>
+                                </li>
+                                @foreach (var itemParameterGroup in item.ParameterGroups)
+                                {
+
+                                    <li class="list-group-item bg-light">
+                                        <span class="btn icon-line-square-plus"></span>
+                                        <i class="@itemParameterGroup.Icon"></i>
+
+
+                                        @itemParameterGroup.Name
+
+                                        <ul class="nested list-group">
+                                            <li>
+                                                <button onclick="updateMyMenu('@itemParameterGroup.Id','@itemParameterGroup.Name','@itemParameterGroup.Filterable',@itemParameterGroup.PropertyType)" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                                <button type="button" onclick="newParameter('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                                <button type="button" onclick="addGroupTranslation('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                                            </li>
+                                            @if (itemParameterGroup.Parameters.Any())
+                                            {
+                                                <li class="list-group-item">
+                                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                                    <table class="table table-bordered mt-2 table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>@lang.InputName</th>
+                                                                <th>@lang.InputType</th>
+                                                                <th>@lang.Index</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        @foreach (var parameter in itemParameterGroup.Parameters)
+                                                        {
+                                                            <tbody class="toggle">
+                                                                <tr>
+                                                                    <td>
+                                                                        <i class="@parameter.Icon"></i>
+                                                                        @parameter.Name
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                                        {
+                                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@parameter.Index</td>
+                                                                    <td>
+                                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                                            <span class="toggle-icon">
+                                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                                            </span>
+                                                                            <span class="toggle-title">
+                                                                                @lang.Translations
+                                                                            </span>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr class="toggle-content">
+                                                                    <td colspan="4">
+                                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                                        <table class="table table-bordered">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>@lang.InputName</th>
+                                                                                    <th>@lang.Language</th>
+                                                                                    <th></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@parameterTranslation.Name</td>
+                                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                                        <td>
+                                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="text-center" colspan="3">
+                                                                                            @lang.NoData
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        }
+                                                    </table>
+                                                </li>
+                                            }
+                                            <li class="list-group-item">
+                                                <h5 class="mb-2">@lang.Translations</h5>
+                                                <table class="table table-bordered mt-2 datatable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var groupTranslation in itemParameterGroup.ParameterGroupTranslations)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    @groupTranslation.Name
+                                                                </td>
+                                                                <td>
+                                                                    @groupTranslation.Language.Name
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                }
+                            }
+                            @if (item.ParameterGroup.Parameters.Any())
+                            {
+                                <li class="list-group-item">
+                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                    <table class="table table-bordered mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>@lang.InputName</th>
+                                                <th>@lang.InputType</th>
+                                                <th>@lang.Index</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+
+                                        @foreach (var parameter in item.ParameterGroup.Parameters.OrderBy(c => c.Index))
+                                        {
+                                            <tbody class="toggle">
+                                                <tr>
+                                                    <td>
+                                                        <i class="@parameter.Icon"></i>
+                                                        @parameter.Name
+                                                    </td>
+                                                    <td>
+                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                        {
+                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                        }
+                                                    </td>
+                                                    <td>@parameter.Index</td>
+                                                    <td>
+                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                            <span class="toggle-icon">
+                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                            </span>
+                                                            <span class="toggle-title">
+                                                                @lang.Translations
+                                                            </span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr class="toggle-content">
+                                                    <td colspan="4">
+                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>@lang.InputName</th>
+                                                                    <th>@lang.Language</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@parameterTranslation.Name</td>
+                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                        <td>
+                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="text-center" colspan="3">
+                                                                            @lang.NoData
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+
+                                        }
+                                    </table>
+                                </li>
+                            }
+                            <li class="list-group-item">
+                                <h5 class="mb-2">@lang.Translations</h5>
+                                <table class="table table-bordered mt-2 datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var groupTranslation in item.ParameterGroup.ParameterGroupTranslations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @groupTranslation.Name
+                                                </td>
+                                                <td>
+                                                    @groupTranslation.Language.Name
+                                                </td>
+                                                <td>
+                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="tab-content clearfix" id="chaletTab">
+            <button type="button" onclick="newMenu(@((int)enums.PropertyType.Resort))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewMenu</button>
+            <ul id="myUL" class="list-group">
+                @foreach (var item in Model.ItemTree.Where(c => c.Type == (int)enums.PropertyType.Resort))
+                {
+                    <li class="list-group-item">
+                        <span class="btn icon-line-square-plus"></span>
+                        Icon
+                        @item.ParameterGroup.Name
+                        <ul class="nested">
+                            <li>
+
+                                <button onclick="updateMyMenu('@item.ParameterGroup.Id', '@item.ParameterGroup.Name', '@item.ParameterGroup.Filterable', @item.ParameterGroup.PropertyType, '@item.ParameterGroup.Icon')" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                <button type="button" onclick="newSubMenu('@item.ParameterGroup.Id',@item.ParameterGroup.PropertyType)" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewSubMenu</button>
+                                <button type="button" onclick="newParameter('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                <button type="button" onclick="addGroupTranslation('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                            </li>
+                            @if (item.HaveNodes)
+                            {
+                                <li>
+                                    <h5 class="mb-1">@lang.SubGroups</h5>
+                                </li>
+                                @foreach (var itemParameterGroup in item.ParameterGroups)
+                                {
+
+                                    <li class="list-group-item bg-light">
+                                        <span class="btn icon-line-square-plus"></span>
+
+                                        Icon
+                                        @itemParameterGroup.Name
+
+                                        <ul class="nested list-group">
+                                            <li>
+                                                <button onclick="updateMyMenu('@itemParameterGroup.Id','@itemParameterGroup.Name','@itemParameterGroup.Filterable',@itemParameterGroup.PropertyType)" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                                <button type="button" onclick="newParameter('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                                <button type="button" onclick="addGroupTranslation('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                                            </li>
+                                            @if (itemParameterGroup.Parameters.Any())
+                                            {
+                                                <li class="list-group-item">
+                                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                                    <table class="table table-bordered mt-2 table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>@lang.InputName</th>
+                                                                <th>@lang.InputType</th>
+                                                                <th>@lang.Index</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        @foreach (var parameter in itemParameterGroup.Parameters)
+                                                        {
+                                                            <tbody class="toggle">
+                                                                <tr>
+                                                                    <td>
+                                                                        @parameter.Name
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                                        {
+                                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@parameter.Index</td>
+                                                                    <td>
+                                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                                            <span class="toggle-icon">
+                                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                                            </span>
+                                                                            <span class="toggle-title">
+                                                                                @lang.Translations
+                                                                            </span>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr class="toggle-content">
+                                                                    <td colspan="4">
+                                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                                        <table class="table table-bordered">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>@lang.InputName</th>
+                                                                                    <th>@lang.Language</th>
+                                                                                    <th></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@parameterTranslation.Name</td>
+                                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                                        <td>
+                                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="text-center" colspan="3">
+                                                                                            @lang.NoData
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        }
+                                                    </table>
+                                                </li>
+                                            }
+                                            <li class="list-group-item">
+                                                <h5 class="mb-2">@lang.Translations</h5>
+                                                <table class="table table-bordered mt-2 datatable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var groupTranslation in itemParameterGroup.ParameterGroupTranslations)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    @groupTranslation.Name
+                                                                </td>
+                                                                <td>
+                                                                    @groupTranslation.Language.Name
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                }
+                            }
+                            @if (item.ParameterGroup.Parameters.Any())
+                            {
+                                <li class="list-group-item">
+                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                    <table class="table table-bordered mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>@lang.InputName</th>
+                                                <th>@lang.InputType</th>
+                                                <th>@lang.Index</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+
+                                        @foreach (var parameter in item.ParameterGroup.Parameters.OrderBy(c => c.Index))
+                                        {
+                                            <tbody class="toggle">
+                                                <tr>
+                                                    <td>
+                                                        @parameter.Name
+                                                    </td>
+                                                    <td>
+                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                        {
+                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                        }
+                                                    </td>
+                                                    <td>@parameter.Index</td>
+                                                    <td>
+                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                            <span class="toggle-icon">
+                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                            </span>
+                                                            <span class="toggle-title">
+                                                                @lang.Translations
+                                                            </span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr class="toggle-content">
+                                                    <td colspan="4">
+                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>@lang.InputName</th>
+                                                                    <th>@lang.Language</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@parameterTranslation.Name</td>
+                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                        <td>
+                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="text-center" colspan="3">
+                                                                            @lang.NoData
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+
+                                        }
+                                    </table>
+                                </li>
+                            }
+                            <li class="list-group-item">
+                                <h5 class="mb-2">@lang.Translations</h5>
+                                <table class="table table-bordered mt-2 datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var groupTranslation in item.ParameterGroup.ParameterGroupTranslations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @groupTranslation.Name
+                                                </td>
+                                                <td>
+                                                    @groupTranslation.Language.Name
+                                                </td>
+                                                <td>
+                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="tab-content clearfix" id="resetTab">
+            <button type="button" onclick="newMenu(@((int)enums.PropertyType.Rest))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewMenu</button>
+            <ul id="myUL" class="list-group">
+                @foreach (var item in Model.ItemTree.Where(c => c.Type == (int)enums.PropertyType.Rest))
+                {
+                    <li class="list-group-item">
+                        <span class="btn icon-line-square-plus"></span>
+                        Icon
+                        @item.ParameterGroup.Name
+                        <ul class="nested">
+                            <li>
+
+                                <button onclick="updateMyMenu('@item.ParameterGroup.Id', '@item.ParameterGroup.Name', '@item.ParameterGroup.Filterable', @item.ParameterGroup.PropertyType, '@item.ParameterGroup.Icon')" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                <button type="button" onclick="newSubMenu('@item.ParameterGroup.Id',@item.ParameterGroup.PropertyType)" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewSubMenu</button>
+                                <button type="button" onclick="newParameter('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                <button type="button" onclick="addGroupTranslation('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                            </li>
+                            @if (item.HaveNodes)
+                            {
+                                <li>
+                                    <h5 class="mb-1">@lang.SubGroups</h5>
+                                </li>
+                                @foreach (var itemParameterGroup in item.ParameterGroups)
+                                {
+
+                                    <li class="list-group-item bg-light">
+                                        <span class="btn icon-line-square-plus"></span>
+
+                                        Icon
+
+                                        @itemParameterGroup.Name
+
+                                        <ul class="nested list-group">
+                                            <li>
+                                                <button onclick="updateMyMenu('@itemParameterGroup.Id','@itemParameterGroup.Name','@itemParameterGroup.Filterable',@itemParameterGroup.PropertyType)" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                                <button type="button" onclick="newParameter('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                                <button type="button" onclick="addGroupTranslation('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                                            </li>
+                                            @if (itemParameterGroup.Parameters.Any())
+                                            {
+                                                <li class="list-group-item">
+                                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                                    <table class="table table-bordered mt-2 table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>@lang.InputName</th>
+                                                                <th>@lang.InputType</th>
+                                                                <th>@lang.Index</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        @foreach (var parameter in itemParameterGroup.Parameters)
+                                                        {
+                                                            <tbody class="toggle">
+                                                                <tr>
+                                                                    <td>
+                                                                        @parameter.Name
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                                        {
+                                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@parameter.Index</td>
+                                                                    <td>
+                                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                                            <span class="toggle-icon">
+                                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                                            </span>
+                                                                            <span class="toggle-title">
+                                                                                @lang.Translations
+                                                                            </span>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr class="toggle-content">
+                                                                    <td colspan="4">
+                                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                                        <table class="table table-bordered">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>@lang.InputName</th>
+                                                                                    <th>@lang.Language</th>
+                                                                                    <th></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@parameterTranslation.Name</td>
+                                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                                        <td>
+                                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="text-center" colspan="3">
+                                                                                            @lang.NoData
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        }
+                                                    </table>
+                                                </li>
+                                            }
+                                            <li class="list-group-item">
+                                                <h5 class="mb-2">@lang.Translations</h5>
+                                                <table class="table table-bordered mt-2 datatable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var groupTranslation in itemParameterGroup.ParameterGroupTranslations)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    @groupTranslation.Name
+                                                                </td>
+                                                                <td>
+                                                                    @groupTranslation.Language.Name
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                }
+                            }
+                            @if (item.ParameterGroup.Parameters.Any())
+                            {
+                                <li class="list-group-item">
+                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                    <table class="table table-bordered mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>@lang.InputName</th>
+                                                <th>@lang.InputType</th>
+                                                <th>@lang.Index</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+
+                                        @foreach (var parameter in item.ParameterGroup.Parameters.OrderBy(c => c.Index))
+                                        {
+                                            <tbody class="toggle">
+                                                <tr>
+                                                    <td>
+                                                        @parameter.Name
+                                                    </td>
+                                                    <td>
+                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                        {
+                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                        }
+                                                    </td>
+                                                    <td>@parameter.Index</td>
+                                                    <td>
+                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                            <span class="toggle-icon">
+                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                            </span>
+                                                            <span class="toggle-title">
+                                                                @lang.Translations
+                                                            </span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr class="toggle-content">
+                                                    <td colspan="4">
+                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>@lang.InputName</th>
+                                                                    <th>@lang.Language</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@parameterTranslation.Name</td>
+                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                        <td>
+                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="text-center" colspan="3">
+                                                                            @lang.NoData
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+
+                                        }
+                                    </table>
+                                </li>
+                            }
+                            <li class="list-group-item">
+                                <h5 class="mb-2">@lang.Translations</h5>
+                                <table class="table table-bordered mt-2 datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var groupTranslation in item.ParameterGroup.ParameterGroupTranslations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @groupTranslation.Name
+                                                </td>
+                                                <td>
+                                                    @groupTranslation.Language.Name
+                                                </td>
+                                                <td>
+                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="tab-content clearfix" id="villsTab">
+            <button type="button" onclick="newMenu(@((int)enums.PropertyType.Villa))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewMenu</button>
+            <ul id="myUL" class="list-group">
+                @foreach (var item in Model.ItemTree.Where(c => c.Type == (int)enums.PropertyType.Villa))
+                {
+                    <li class="list-group-item">
+                        <span class="btn icon-line-square-plus"></span>
+                        icon
+                        @item.ParameterGroup.Name
+                        <ul class="nested">
+                            <li>
+
+                                <button onclick="updateMyMenu('@item.ParameterGroup.Id', '@item.ParameterGroup.Name', '@item.ParameterGroup.Filterable', @item.ParameterGroup.PropertyType, '@item.ParameterGroup.Icon')" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                <button type="button" onclick="newSubMenu('@item.ParameterGroup.Id',@item.ParameterGroup.PropertyType)" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewSubMenu</button>
+                                <button type="button" onclick="newParameter('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                <button type="button" onclick="addGroupTranslation('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                            </li>
+                            @if (item.HaveNodes)
+                            {
+                                <li>
+                                    <h5 class="mb-1">@lang.SubGroups</h5>
+                                </li>
+                                @foreach (var itemParameterGroup in item.ParameterGroups)
+                                {
+
+                                    <li class="list-group-item bg-light">
+                                        <span class="btn icon-line-square-plus"></span>
+
+                                        Icon
+
+                                        @itemParameterGroup.Name
+
+                                        <ul class="nested list-group">
+                                            <li>
+                                                <button onclick="updateMyMenu('@itemParameterGroup.Id','@itemParameterGroup.Name','@itemParameterGroup.Filterable',@itemParameterGroup.PropertyType)" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                                <button type="button" onclick="newParameter('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                                <button type="button" onclick="addGroupTranslation('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                                            </li>
+                                            @if (itemParameterGroup.Parameters.Any())
+                                            {
+                                                <li class="list-group-item">
+                                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                                    <table class="table table-bordered mt-2 table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>@lang.InputName</th>
+                                                                <th>@lang.InputType</th>
+                                                                <th>@lang.Index</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        @foreach (var parameter in itemParameterGroup.Parameters)
+                                                        {
+                                                            <tbody class="toggle">
+                                                                <tr>
+                                                                    <td>
+                                                                        @parameter.Name
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                                        {
+                                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@parameter.Index</td>
+                                                                    <td>
+                                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                                            <span class="toggle-icon">
+                                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                                            </span>
+                                                                            <span class="toggle-title">
+                                                                                @lang.Translations
+                                                                            </span>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr class="toggle-content">
+                                                                    <td colspan="4">
+                                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                                        <table class="table table-bordered">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>@lang.InputName</th>
+                                                                                    <th>@lang.Language</th>
+                                                                                    <th></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@parameterTranslation.Name</td>
+                                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                                        <td>
+                                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="text-center" colspan="3">
+                                                                                            @lang.NoData
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        }
+                                                    </table>
+                                                </li>
+                                            }
+                                            <li class="list-group-item">
+                                                <h5 class="mb-2">@lang.Translations</h5>
+                                                <table class="table table-bordered mt-2 datatable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var groupTranslation in itemParameterGroup.ParameterGroupTranslations)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    @groupTranslation.Name
+                                                                </td>
+                                                                <td>
+                                                                    @groupTranslation.Language.Name
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                }
+                            }
+                            @if (item.ParameterGroup.Parameters.Any())
+                            {
+                                <li class="list-group-item">
+                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                    <table class="table table-bordered mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>@lang.InputName</th>
+                                                <th>@lang.InputType</th>
+                                                <th>@lang.Index</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+
+                                        @foreach (var parameter in item.ParameterGroup.Parameters.OrderBy(c => c.Index))
+                                        {
+                                            <tbody class="toggle">
+                                                <tr>
+                                                    <td>
+                                                        @parameter.Name
+                                                    </td>
+                                                    <td>
+                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                        {
+                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                        }
+                                                    </td>
+                                                    <td>@parameter.Index</td>
+                                                    <td>
+                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                            <span class="toggle-icon">
+                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                            </span>
+                                                            <span class="toggle-title">
+                                                                @lang.Translations
+                                                            </span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr class="toggle-content">
+                                                    <td colspan="4">
+                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>@lang.InputName</th>
+                                                                    <th>@lang.Language</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@parameterTranslation.Name</td>
+                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                        <td>
+                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="text-center" colspan="3">
+                                                                            @lang.NoData
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+
+                                        }
+                                    </table>
+                                </li>
+                            }
+                            <li class="list-group-item">
+                                <h5 class="mb-2">@lang.Translations</h5>
+                                <table class="table table-bordered mt-2 datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var groupTranslation in item.ParameterGroup.ParameterGroupTranslations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @groupTranslation.Name
+                                                </td>
+                                                <td>
+                                                    @groupTranslation.Language.Name
+                                                </td>
+                                                <td>
+                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="tab-content clearfix" id="resortTab">
+            <button type="button" onclick="newMenu(@((int)enums.PropertyType.Resort))" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewMenu</button>
+            <ul id="myUL" class="list-group">
+                @foreach (var item in Model.ItemTree.Where(c => c.Type == (int)enums.PropertyType.Resort))
+                {
+                    <li class="list-group-item">
+                        <span class="btn icon-line-square-plus"></span>
+                        Icon
+                        @item.ParameterGroup.Name
+                        <ul class="nested">
+                            <li>
+
+                                <button onclick="updateMyMenu('@item.ParameterGroup.Id', '@item.ParameterGroup.Name', '@item.ParameterGroup.Filterable', @item.ParameterGroup.PropertyType, '@item.ParameterGroup.Icon')" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                <button type="button" onclick="newSubMenu('@item.ParameterGroup.Id',@item.ParameterGroup.PropertyType)" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewSubMenu</button>
+                                <button type="button" onclick="newParameter('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                <button type="button" onclick="addGroupTranslation('@item.ParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                            </li>
+                            @if (item.HaveNodes)
+                            {
+                                <li>
+                                    <h5 class="mb-1">@lang.SubGroups</h5>
+                                </li>
+                                @foreach (var itemParameterGroup in item.ParameterGroups)
+                                {
+
+                                    <li class="list-group-item bg-light">
+                                        <span class="btn icon-line-square-plus"></span>
+
+                                        Icon
+
+                                        @itemParameterGroup.Name
+
+                                        <ul class="nested list-group">
+                                            <li>
+                                                <button onclick="updateMyMenu('@itemParameterGroup.Id','@itemParameterGroup.Name','@itemParameterGroup.Filterable',@itemParameterGroup.PropertyType)" class="btn btn-success btn-sm mb-2"><i class="icon-trash"></i> @lang.Edit</button>
+                                                <a class="btn btn-danger btn-sm text-white mb-2"><i class="icon-trash"></i> @lang.Delete</a>
+                                                <button type="button" onclick="newParameter('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddNewField</button>
+                                                <button type="button" onclick="addGroupTranslation('@itemParameterGroup.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+                                            </li>
+                                            @if (itemParameterGroup.Parameters.Any())
+                                            {
+                                                <li class="list-group-item">
+                                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                                    <table class="table table-bordered mt-2 table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>@lang.InputName</th>
+                                                                <th>@lang.InputType</th>
+                                                                <th>@lang.Index</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        @foreach (var parameter in itemParameterGroup.Parameters)
+                                                        {
+                                                            <tbody class="toggle">
+                                                                <tr>
+                                                                    <td>
+                                                                        @parameter.Name
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                                        {
+                                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@parameter.Index</td>
+                                                                    <td>
+                                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                                            <span class="toggle-icon">
+                                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                                            </span>
+                                                                            <span class="toggle-title">
+                                                                                @lang.Translations
+                                                                            </span>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr class="toggle-content">
+                                                                    <td colspan="4">
+                                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                                        <table class="table table-bordered">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>@lang.InputName</th>
+                                                                                    <th>@lang.Language</th>
+                                                                                    <th></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td>@parameterTranslation.Name</td>
+                                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                                        <td>
+                                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                                {
+                                                                                    <tr>
+                                                                                        <td class="text-center" colspan="3">
+                                                                                            @lang.NoData
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                }
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        }
+                                                    </table>
+                                                </li>
+                                            }
+                                            <li class="list-group-item">
+                                                <h5 class="mb-2">@lang.Translations</h5>
+                                                <table class="table table-bordered mt-2 datatable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var groupTranslation in itemParameterGroup.ParameterGroupTranslations)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    @groupTranslation.Name
+                                                                </td>
+                                                                <td>
+                                                                    @groupTranslation.Language.Name
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <th>@lang.GroupName</th>
+                                                            <th>@lang.Language</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                }
+                            }
+                            @if (item.ParameterGroup.Parameters.Any())
+                            {
+                                <li class="list-group-item">
+                                    <h5 class="mb-2">@lang.Parameters</h5>
+                                    <table class="table table-bordered mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>@lang.InputName</th>
+                                                <th>@lang.InputType</th>
+                                                <th>@lang.Index</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+
+                                        @foreach (var parameter in item.ParameterGroup.Parameters.OrderBy(c => c.Index))
+                                        {
+                                            <tbody class="toggle">
+                                                <tr>
+                                                    <td>
+                                                        @parameter.Name
+                                                    </td>
+                                                    <td>
+                                                        @if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                                                        {
+                                                            <span class="text-info"><i class="icon-line-square-check"></i> @lang.Checkbox</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-primary"><i class="icon-pen-alt"></i> @lang.InputField</span>
+                                                        }
+                                                    </td>
+                                                    <td>@parameter.Index</td>
+                                                    <td>
+                                                        <button type="button" onclick="updateParameter('@parameter.Id', '@parameter.Name', @parameter.Type, '@parameter.Index')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                        <button type="button" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</button>
+                                                        <button type="button" class="btn btn-danger btn-sm toggle-header">
+                                                            <span class="toggle-icon">
+                                                                <i class="toggle-closed icon-ok-circle"></i>
+                                                                <i class="toggle-open icon-remove-circle"></i>
+                                                            </span>
+                                                            <span class="toggle-title">
+                                                                @lang.Translations
+                                                            </span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr class="toggle-content">
+                                                    <td colspan="4">
+                                                        <h5 class="mb-2">@lang.Translations</h5>
+                                                        <button type="button" onclick="addParameterTranslation('@parameter.Id')" class="btn btn-primary btn-sm mb-2"><i class="icon-plus"></i> @lang.AddTranslation</button>
+
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>@lang.InputName</th>
+                                                                    <th>@lang.Language</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var parameterTranslation in parameter.ParameterTranslations)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@parameterTranslation.Name</td>
+                                                                        <td>@parameterTranslation.Language.Name</td>
+                                                                        <td>
+                                                                            <button type="button" onclick="updateParameterTranslate('@parameterTranslation.Id','@parameterTranslation.ParameterId', '@parameterTranslation.Name', '@parameterTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                                            <a href="@Url.Action("RemoveParameterTranslation",new {id=parameterTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                                @if (parameter.ParameterTranslations.Count == 0)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="text-center" colspan="3">
+                                                                            @lang.NoData
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+
+                                        }
+                                    </table>
+                                </li>
+                            }
+                            <li class="list-group-item">
+                                <h5 class="mb-2">@lang.Translations</h5>
+                                <table class="table table-bordered mt-2 datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var groupTranslation in item.ParameterGroup.ParameterGroupTranslations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @groupTranslation.Name
+                                                </td>
+                                                <td>
+                                                    @groupTranslation.Language.Name
+                                                </td>
+                                                <td>
+                                                    <button type="button" onclick="updateGroupTranslate('@groupTranslation.Id','@groupTranslation.ParameterGroupId', '@groupTranslation.Name', '@groupTranslation.LanguageId')" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</button>
+                                                    <a href="@Url.Action("RemoveGroupTranslation",new {id=groupTranslation.Id})" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>@lang.GroupName</th>
+                                            <th>@lang.Language</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="myParameterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SaveParameter" method="post" class="was-validated modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">@lang.AddNewField</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Parameter.Id" />
+                    <input type="hidden" asp-for="Parameter.ParameterGroupId" />
+                    <div class="form-group">
+                        <label asp-for="Parameter.Name">@lang.Name</label>
+                        <input type="text" asp-for="Parameter.Name" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Parameter.Index">@lang.Index</label>
+                        <input type="text" asp-for="Parameter.Index" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Parameter.Type">@lang.ParameterType</label>
+                        <select asp-for="Parameter.Type" class="form-control" required="">
+                            <option value="" selected="">@lang.PleaseSelect</option>
+                            <option value="@((int)enums.ParameterType.Checkbox)">@lang.Checkbox</option>
+                            <option value="@((int)enums.ParameterType.Text)">@lang.InputField</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Parameter.Icon">@lang.Icon</label>
+                        <input asp-for="Parameter.Icon" type="hidden">
+                        <span class="iconContent">
+                            <i></i>
+                        </span>
+                        <partial name="real-state-icons" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="mySubMenuModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SaveSubGroup" method="post" class="was-validated modal-content" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myMenuModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="ParameterGroup.Id" />
+                    <input type="hidden" asp-for="ParameterGroup.ParentId" />
+                    <input type="hidden" asp-for="ParameterGroup.PropertyType" />
+                    <div class="form-group">
+                        <label asp-for="ParameterGroup.Name">@lang.Name</label>
+                        <input type="text" asp-for="ParameterGroup.Name" class="form-control" required="" />
+                    </div>
+
+                    <div class="form-check">
+                        <input type="checkbox" asp-for="ParameterGroup.Filterable" />
+                        <label asp-for="ParameterGroup.Filterable">@lang.Filterable</label>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ParameterGroup.Icon">@lang.Icon</label>
+                        <input asp-for="ParameterGroup.Icon" type="hidden" >
+                        <span class="iconContent">
+                            <i></i>
+                        </span>
+                        <partial name="real-state-icons" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myGroupTranslaterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SaveGroupTranslation" method="post" class="was-validated modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myMenuModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="ParameterGroupTranslation.Id" />
+                    <input type="hidden" asp-for="ParameterGroupTranslation.ParameterGroupId" />
+                    <div class="form-group">
+                        <label asp-for="ParameterGroupTranslation.Name"></label>
+                        <input type="text" asp-for="ParameterGroupTranslation.Name" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ParameterGroupTranslation.LanguageId">@lang.Language</label>
+                        <select asp-for="ParameterGroupTranslation.LanguageId" asp-items="ViewBag.Languages" class="form-control" required="">
+                            <option value="" selected="">@lang.PleaseSelect</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myParameterTranslaterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SaveParameterTranslation" method="post" class="was-validated modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myMenuModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" asp-for="ParameterTranslation.Id" />
+                    <input type="hidden" asp-for="ParameterTranslation.ParameterId" />
+                    <div class="form-group">
+                        <label asp-for="ParameterTranslation.Name">@lang.InputName</label>
+                        <input type="text" asp-for="ParameterTranslation.Name" class="form-control" required="" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ParameterTranslation.LanguageId">@lang.Language</label>
+                        <select asp-for="ParameterTranslation.LanguageId" asp-items="ViewBag.Languages" class="form-control" required="">
+                            <option value="" selected="">@lang.PleaseSelect</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Cancel</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section js
+{
+
+    <script src="~/js/treeview.js"></script>
+    <script>
+        var toggler = document.getElementsByClassName("icon-line-square-plus");
+        var i;
+
+        for (i = 0; i < toggler.length; i++) {
+            toggler[i].addEventListener("click", function () {
+                this.parentElement.querySelector(".nested").classList.toggle("active");
+                this.classList.toggle("icon-line-square-minus");
+            });
+        }
+        function newMenu(propType) {
+            $("#proprityType").removeClass("d-none");
+            $("#ParameterGroup_Id").val("");
+            $("#ParameterGroup_Name").val("");
+            $("#ParameterGroup_PropertyType").val(propType);
+            $("#ParameterGroup_ParentId").val("");
+            document.getElementById('ParameterGroup_Filterable').checked = true;
+            $("#myMenuModalLabel").html('@lang.AddNewMenu');
+            $("#mySubMenuModal").modal("show");
+        }
+        function newSubMenu(groupId, PropertyType) {
+            $("#proprityType").addClass("d-none");
+            $("#ParameterGroup_Id").val("");
+            $("#ParameterGroup_Name").val("");
+            $("#ParameterGroup_PropertyType").val(PropertyType);
+            $("#ParameterGroup_ParentId").val(groupId);
+            document.getElementById('ParameterGroup_Filterable').checked = true;
+            $("#myMenuModalLabel").html('@lang.AddNewSubMenu');
+            $("#mySubMenuModal").modal("show");
+        }
+        function updateMyMenu(id, name, filterable, propertyType, image) {
+            $("#ParameterGroup_Id").val(id);
+            $("#ParameterGroup_Name").val(name);
+            $("#ParameterGroup_PropertyType").val(propertyType);
+
+            //console.log(image);
+            //document.getElementById("groupImage").src = image;
+            if (filterable === 'true') {
+                document.getElementById('ParameterGroup_Filterable').checked = true;
+            } else {
+                document.getElementById('ParameterGroup_Filterable').checked = false;
+            }
+            $("#mySubMenuModal").modal("show");
+        }
+
+
+
+        function newParameter(groupId) {
+            $("#Parameter_ParameterGroupId").val(groupId);
+            $("#myParameterModal").modal("show");
+        }
+
+
+        function updateParameter(id, name, type, index) {
+            $("#Parameter_Id").val(id);
+            $("#Parameter_Name").val(name);
+            $("#Parameter_Type").val(type);
+            $("#Parameter_Index").val(index);
+            $("#myParameterModal").modal("show");
+        }
+
+
+        function addGroupTranslation(groupId) {
+            $("#ParameterGroupTranslation_ParameterGroupId").val(groupId);
+            $("#ParameterGroupTranslation_LanguageId").val("");
+            $("#myGroupTranslaterModal").modal("show");
+        }
+
+        function updateGroupTranslate(id,groupId, name, languageId) {
+            $("#ParameterGroupTranslation_Id").val(id);
+            $("#ParameterGroupTranslation_ParameterGroupId").val(groupId);
+            $("#ParameterGroupTranslation_Name").val(name);
+            $("#ParameterGroupTranslation_LanguageId").val(languageId);
+            $("#myGroupTranslaterModal").modal("show");
+        }
+
+
+
+
+        function addParameterTranslation(groupId) {
+            $("#ParameterTranslation_ParameterId").val(groupId);
+            $("#ParameterTranslation_LanguageId").val("");
+            $("#myParameterTranslaterModal").modal("show");
+        }
+
+        function updateParameterTranslate(id, paramId, name, languageId) {
+            $("#ParameterTranslation_Id").val(id);
+            $("#ParameterTranslation_ParameterId").val(paramId);
+            $("#ParameterTranslation_Name").val(name);
+            $("#ParameterTranslation_LanguageId").val(languageId);
+            $("#myParameterTranslaterModal").modal("show");
+        }
+
+        $("#mySubMenuModal .icons-list li").on("click", function () {
+            $("#ParameterGroup_Icon").val($(this).find("i").attr("class"));
+            $("#mySubMenuModal .iconContent i").removeClass();
+            $("#mySubMenuModal .iconContent i").addClass($(this).find("i").attr("class"));
+        });
+        $("#myParameterModal .icons-list li").on("click", function () {
+            $("#Parameter_Icon").val($(this).find("i").attr("class"));
+            $("#myParameterModal .iconContent i").removeClass();
+            $("#myParameterModal .iconContent i").addClass($(this).find("i").attr("class"));
+        });
+    </script>
+}

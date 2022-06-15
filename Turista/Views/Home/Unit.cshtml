@@ -1,0 +1,641 @@
+﻿@model Turista.Models.UnitViewModel
+@{
+    ViewData["Title"] = Model.Property.PropertyName;
+    var images = Model.Property.PropertyImages.OrderByDescending(c => c.IsPrimary).ToList();
+    var primaryImage = "";
+    var secImages = new List<string>();
+    if (images.Count > 0)
+    {
+        primaryImage = Url.Content("~/" + images.FirstOrDefault(c => c.IsPrimary).File.FileContent);
+        primaryImage = primaryImage.Replace("\\", "/");
+        foreach (var item in images.Where(c => !c.IsPrimary).Take(4))
+        {
+            var img = Url.Content("~/" + item.File.FileContent);
+            img = img.Replace("\\", "/");
+            secImages.Add(img);
+        }
+    }
+    var dates = Domain.Reservation.GetCheckedDates(HttpContextAccessor.HttpContext);
+    var offers = Domain.Reservation.getPropertyOfferWithoutCalc(context, Model.Property, dates.CheckIn, dates.CheckOut);
+    var offersSum = Domain.Reservation.getPropertyOffer(context, Model.Property, dates.CheckIn, dates.CheckOut);
+    var rate = (Model.Review.Cleaning + Model.Review.Crew + Model.Review.PropertyCondition) / 3;
+    if (rate + "" == double.NaN.ToString())
+    {
+        rate = 0;
+    }
+    var resortName = Domain.Properties.GetResortName(context, Model.Property);
+}
+
+@section css{
+    <link href="~/css/jquery-ui.min.css" rel="stylesheet" />
+
+    <link href="~/css/jquery.comiseo.daterangepicker.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/components/bs-rating.css" type="text/css" />
+    <link href="~/css/components/ion.rangeslider-vars.css" rel="stylesheet" />
+    <style>
+        .primary-Image {
+            height: 450px;
+            background-size: cover;
+        }
+
+        .secondary-image {
+            height: 225px;
+            background-size: cover;
+        }
+    </style>
+}
+<section id="content">
+    <div class="content-wrap pt-3">
+        <div class="container clearfix single-post mb-0">
+            <div class="entry-title">
+                <h2>@Model.Property.PropertyName</h2>
+            </div>
+            <!-- Entry Meta
+                    ============================================= -->
+            <div class="entry-meta">
+                <ul>
+                    @if (!string.IsNullOrEmpty(Model.Property.PropertyCode))
+                    {
+                        <li><i class="icon-hashtag text-secondary"></i> @lang.UnitCode  (@Model.Property.PropertyCode)</li>
+                    }
+                    <li><i class="icon-map-marked-alt text-danger"></i> <a href="#">@Model.Property.City.CityName</a>, <a href="#">@Model.Property.Region</a></li>
+                    <li><a href="#"><i class="icon-memory"></i> @lang.UnitSpace @Model.Property.Space @lang.meterSq</a></li>
+                    <li><a href="#"><i class="icon-star text-warning"></i> <b>@string.Format("{0:N1}", rate)</b> (@Model.Property.Reviews.Count()) @lang.Rating</a></li>
+                    <li><a href="#"><i class="icon-eye text-primary"></i> @Model.Property.Views</a></li>
+                    @if (!string.IsNullOrEmpty(resortName))
+                    {
+                        <li><a href="#"><i class="icon-umbrella-beach text-success"></i>@lang.ResortName: @resortName</a></li>
+                    }
+                    <li><i class="icon-users"></i> @lang.PersonsAllowed @Model.Property.AllowedPersons</li>
+                </ul>
+            </div><!-- .entry-meta end -->
+            <!-- Entry Image
+                            ============================================= -->
+            <div class="row">
+                <div class="col-md-6 col-lg-6 px-1 py-1 position-relative">
+                    <div class="primary-Image" style="background-image:url('@primaryImage');">
+                        <div class="d-flex flex-shrink-1" data-lightbox="gallery">
+                            @foreach (var item in images)
+                            {
+                                if (images.IndexOf(item) == 0)
+                                {
+                                    <a href="@Url.Content("~/"+item.File.FileContent)" class="button button-color button-rounded nott m-0 font-weight-medium viewGallryBtn align-self-end" data-lightbox="gallery-item"><i class="icon-picture"></i> @lang.ViewGallery</a>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Content("~/"+item.File.FileContent)" class="d-none" data-lightbox="gallery-item"></a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 py-1">
+                    <div class="row">
+                        @foreach (var item in secImages)
+                        {
+                            <div class="col-md-6 col-6 col-sm-6 px-1 pb-1">
+                                <div class="secondary-image" style="background-image:url('@item')">
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div><!-- .entry-image end -->
+        </div>
+        <div class="section mt-0" style="padding: 30px 0">
+            <div class="container clearfix">
+                <div class="row">
+                    @foreach (var parameter in Model.Property.ParameterValues.OrderBy(c => c.Parameter.Order).Take(6))
+                    {
+                        <div class="col-md-2 col-6 center">
+                            <i class="@parameter.Parameter.Icon i-plain i-xlarge mx-auto mb-0"></i>
+                            <h5 class="my-1">@parameter.Parameter.Name</h5>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="container clearfix">
+
+            <div class="row gutter-40 col-mb-80">
+                <div class="postcontent col-lg-8">
+                    <div class="mb-2">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (Model.Property.IsFive)
+                            {
+                                <button id="fiveBtn" onclick="fiverate(this,'@Model.Property.Id')" class="btn btn-danger">
+                                    <i class="icon-heartbeat"></i> @lang.RemoveFromFive
+                                </button>
+                            }
+                            else
+                            {
+                                <button id="fiveBtn" onclick="fiverate(this,'@Model.Property.Id')" class="btn btn-primary">
+                                    <i class="icon-heart"></i> @lang.AddtoFive
+                                </button>
+                            }
+                        }
+                        else
+                        {
+                            <a href="~/Accounts/Login?ReturnUrl=@Context.Request.Path" class="btn btn-primary">
+                                <i class="icon-heart"></i> @lang.AddtoFive
+                            </a>
+                        }
+                    </div>
+                    @Html.Raw(Model.Property.Description)
+                    @foreach (var group in Model.ParameterGroups.OrderBy(c => c.Order))
+                    {
+                        var paramCount = (Model.Property.ParameterValues.Count(c => c.Parameter.ParameterGroupId == group.Id) / 4) + 1;
+                        <h4 class="mb-0 topmargin"><i class="@group.Icon"></i> @group.Name</h4>
+                        <div class="line line-sm mt-1 mb-3"></div>
+                        <div class="row clearfix">
+                            @for (int i = 0; i < paramCount; i++)
+                            {
+                                var skip = i * 4;
+                                <div class="col-md-4">
+                                    <ul class="iconlist">
+                                        @foreach (var parameter in Model.Property.ParameterValues.Where(c => c.Parameter.ParameterGroupId == group.Id).Skip(skip).Take(4))
+                                        {
+                                            if (parameter.Parameter.Type == 0)
+                                            {
+                                                <li class="mb-1"><i class="@parameter.Parameter.Icon"></i>@parameter.Parameter.Name: @parameter.Value</li>
+                                            }
+                                            else
+                                            {
+                                                <li class="mb-1"><i class="icon-line2-check"></i>@parameter.Parameter.Name</li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    }
+                    <div class="line"></div>
+
+                    <div id="myreviews"></div>
+                </div>
+
+                <div class="sidebar sticky-sidebar-wrap col-lg-4">
+                    <div class="sidebar-widgets-wrap">
+                        <div class="sticky-sidebar">
+
+                            <div class="widget quick-contact-widget form-widget clearfix">
+
+                                <div class="card bg-light">
+
+                                    <div class="card-body">
+
+                                        <input id="reservedate" name="reservedate" type="hidden">
+                                        <table class="table table-bordered tableCheckin">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="h4" colspan="2">
+                                                        @if (offers.Any(c => c.Date.Date == dates.CheckIn.Date))
+                                                        {
+                                                            <del class="text-smaller text-danger">
+                                                                @Model.Property.DayPrice @lang.Currency
+                                                            </del><br />
+                                                            <strong> @offers.FirstOrDefault(c => c.Date.Date == dates.CheckIn.Date).Amount @lang.Currency</strong>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@Model.Property.DayPrice @lang.Currency</span>
+                                                        }
+                                                        <span class="h6">/@lang.Night</span>
+                                                    </td>
+
+                                                </tr>
+                                                @if (Model.Property.IsDayPrice && Model.Property.PricePerDays != null)
+                                                {
+                                                    <tr>
+                                                        <th colspan="2">@lang.PricePerDays</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+
+                                                                    @lang.Saturday
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @Model.Property.PricePerDays.Saturday @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+
+                                                                    @lang.Sunday
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @Model.Property.PricePerDays.Sunday @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+
+                                                                    @lang.Monday
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @Model.Property.PricePerDays.Monday @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+
+                                                                    @lang.Tuesday
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @Model.Property.PricePerDays.Tuesday @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+
+                                                                    @lang.Wednesday
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @Model.Property.PricePerDays.Wednesday @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+
+                                                                    @lang.Thursday
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @Model.Property.PricePerDays.Thursday @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+
+                                                                    @lang.Friday
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @Model.Property.PricePerDays.Friday @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td>
+                                                        <strong>@lang.CheckIn</strong>
+                                                        <br>
+                                                        <span>@dates.CheckIn.ToString("dd-MM-yyyy")</span>
+                                                    </td>
+                                                    <td>
+                                                        <strong>@lang.CheckOut</strong>
+                                                        <br>
+                                                        <span>@dates.CheckOut.ToString("dd-MM-yyyy")</span>
+                                                        <i onclick='$("#reservedate").daterangepicker("open");' class="cursorChecInOutChange">
+                                                            <i class="" data-fa-i2svg="">
+                                                                <svg class="svg-inline--fa fa-chevron-down fa-w-14" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+                                                                    <path fill="currentColor" d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"></path>
+                                                                </svg>
+                                                            </i>
+                                                        </i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <strong>@lang.DaysCount</strong>
+                                                        <br>
+                                                        <label>
+                                                            @if (dates.DaysCount == 1)
+                                                            {
+                                                                <span>@lang.OneNight</span>
+                                                            }
+                                                            else if (dates.DaysCount == 2)
+                                                            {
+                                                                <span>@lang.TowNights</span>
+                                                            }
+                                                            else if (dates.DaysCount > 2 && dates.DaysCount < 10)
+                                                            {
+                                                                <span>@dates.DaysCount @lang.Nights</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>@dates.DaysCount @lang.Night</span>
+                                                            }
+                                                        </label>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>@lang.CheckInTime</strong>
+                                                        <br>
+                                                        <span>@Model.Property.CheckInTime</span>
+                                                    </td>
+                                                    <td>
+                                                        <strong>@lang.CheckOutTime</strong>
+                                                        <br>
+                                                        <span>@Model.Property.CheckOutTime</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <input type="hidden" id="isReserved" value="@Model.Property.IsReserved.ToString()" />
+                                                        @if (Model.Property.IsReserved)
+                                                        {
+                                                            <button id="reserveBtn" onclick='Reserve()' class="btn btn-success button-circle button-rounded w-100" type="button">@lang.PropertyReservedSelectAnotherDate</button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button id="reserveBtn" onclick='Reserve()' class="btn btn-success button-circle button-rounded w-100" type="button">@lang.Reserve</button>
+                                                        }
+                                                        <div class="text-center">
+                                                            @lang.YouWillPayNow @Model.Property.DepositAmount @lang.Currency
+                                                        </div>
+                                                        <br />
+                                                        <h3 class="mt-4 mb-2">@lang.InvoiceDetails</h3>
+                                                        <div class="row">
+                                                            <div class="col-8 col-md-8 col-lg-8">
+                                                                @Model.Property.DayPrice
+                                                                &Chi;
+                                                                <label>
+                                                                    @if (dates.DaysCount == 1)
+                                                                    {
+                                                                        <span>@lang.OneNight</span>
+                                                                    }
+                                                                    else if (dates.DaysCount == 2)
+                                                                    {
+                                                                        <span>@lang.TowNights</span>
+                                                                    }
+                                                                    else if (dates.DaysCount > 2 && dates.DaysCount < 10)
+                                                                    {
+                                                                        <span>@dates.DaysCount @lang.Nights</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span>@dates.DaysCount @lang.Night</span>
+                                                                    }
+                                                                </label>
+
+
+                                                            </div>
+                                                            <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                @{
+                                                                    var totalPrice = dates.DaysCount * Model.Property.DayPrice;
+                                                                }
+                                                                @totalPrice @lang.Currency
+                                                            </div>
+                                                        </div>
+                                                        @if (offersSum.Sum(c => c.Amount) > 0)
+                                                        {
+                                                            <div class="row">
+                                                                <div class="col-8 col-md-8 col-lg-8">
+                                                                    <strong>
+                                                                        @lang.DiscountFromOffers
+                                                                    </strong>
+                                                                </div>
+                                                                <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                    <strong>
+                                                                        @offersSum.Sum(c => c.Amount) @lang.Currency
+                                                                    </strong>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        <div class="row">
+                                                            <div class="col-8 col-md-8 col-lg-8">
+                                                                <strong>
+                                                                    @lang.Total
+                                                                </strong>
+                                                            </div>
+                                                            <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                <strong>
+                                                                    @totalPrice @lang.Currency
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="widget clearfix">
+                                <h4>@lang.Map</h4>
+                                @if (Model.Property.IsReservedBefore)
+                                {
+                                    <div style="height:300px" id="map"></div>
+                                }
+                                else
+                                {
+                                    <div class="p-2">
+                                        @lang.LocationDisplayed
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="widget clearfix">
+                                <h4>@lang.Share</h4>
+                                <div>
+                                    <button type="button" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + location.href)" class="social-icon si-colored si-small si-rounded si-facebook">
+                                        <i class="icon-facebook"></i>
+                                        <i class="icon-facebook"></i>
+                                    </button>
+                                    <button type="button" onclick="window.open('http://twitter.com/home/?status=' + location.href)" class="social-icon si-colored si-small si-rounded si-twitter">
+                                        <i class="icon-twitter"></i>
+                                        <i class="icon-twitter"></i>
+                                    </button>
+                                    <button type="button" onclick="window.open('whatsapp://send?text=' + location.href)" class="social-icon si-colored si-small si-rounded si-whatsapp">
+                                        <i class="icon-whatsapp"></i>
+                                        <i class="icon-whatsapp"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- .content-wrap end -->
+</section><!-- #content end -->
+<!-- Modal -->
+<div class="modal fade" id="rateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form method="post" asp-action="Rate" class="modal-content was-validated">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="RateId" />
+                    <input type="hidden" name="PropertyId" id="Unit_Id" value="@Model.Property.Id" />
+                    <div class="form-group">
+                        <label>@lang.PropertyCondition</label>
+                        <input name="PropertyCondition" id="PropertyCondition" type="number" class="rating" min="1" max="5" data-size="sm">
+                    </div>
+                    <div class="form-group">
+                        <label>@lang.Crew</label>
+                        <input name="Crew" id="Crew1" type="number" class="rating" min="1" max="5" data-size="sm">
+                    </div>
+                    <div class="form-group">
+                        <label>@lang.Cleaning</label>
+                        <input name="Cleaning" id="Cleaning" type="number" class="rating" min="1" max="5" data-size="sm">
+                    </div>
+                    <textarea class="form-control" rows="6" id="Comment" required="" name="Comment"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Close</button>
+                    <button type="submit" class="btn btn-primary">@lang.Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+
+<input type="hidden" id="latitude" value="@Model.Property.Latitude" />
+<input type="hidden" id="longitude" value="@Model.Property.Longitude" />
+@section js{
+    @if (Model.Property.IsReservedBefore)
+    {
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMvk54X0cJtOPiSu60rk-OdX8alzz7Htk&callback=initMap"
+                type="text/javascript"></script>
+    }
+    <script src="~/js/components/star-rating.js"></script>
+    <script src="~/js/jquery.comiseo.daterangepicker.min.js"></script>
+    <script>
+        GetReviews();
+        function GetCheckIn() {
+            var date = $("#reservedate").val();
+            var propertyId = '@Model.Property.Id';
+            $.ajax({
+                url: '@Url.Action("GetCheckIn")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: { date: date, propertyId: propertyId }
+            }).then(function (content) {
+                $(".tableCheckin").html(content);
+            });
+        }
+        function GetReviews() {
+            var propertyId = '@Model.Property.Id';
+            $.ajax({
+                url: '@Url.Action("GetReviews")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: { propertyId: propertyId }
+            }).then(function (content) {
+                $("#myreviews").html(content);
+            });
+        }
+        var view = 5;
+        function getMoreReviews() {
+            var propertyId = '@Model.Property.Id';
+            var totalReviewCount = Number($("#totalReviewCount").val());
+            var currentReview = Number($("#currentReview").val());
+
+            $.ajax({
+                url: '@Url.Action("GetMoreReviews")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: { propertyId: propertyId, index: currentReview }
+            }).then(function (content) {
+                $("#commentlist").append(content);
+                currentReview = currentReview + view;
+                $("#currentReview").val(currentReview);
+                if (currentReview >= totalReviewCount) {
+                    $("#loadMoreBtn").fadeOut(0);
+                }
+            });
+        }
+        function Reserve() {
+            var isReserved = $("#isReserved").val();
+            if (isReserved=='True') {
+                $("#reservedate").daterangepicker("open");
+            } else {
+                location.href = '@Url.Action("Reserve", "Home", new { id = Model.Property.Id })';
+            }
+        }
+  $(function () {
+        $("#reservedate").daterangepicker({
+                numberOfMonths: 12,
+         isRTL: true,
+            initialText: '@Html.Raw(lang.BookingDate)',
+                applyOnMenuSelect: false,
+                datepickerOptions: {
+                    minDate: 0,
+                    maxDate: '6m'
+            },
+            applyButtonText: `@Html.Raw(lang.Ok)`,
+            clearButtonText: '@Html.Raw(lang.Delete)',
+            cancelButtonText: '@Html.Raw(lang.Cancel)',
+
+        });
+
+        $("#reservedate").on('change', function (event) { GetCheckIn(); });
+  });
+
+        let map, infoWindow;
+
+
+        function initMap() {
+            image = 'http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png';
+
+            var option = {
+                center: { lat: 0, lng: 0 },
+                zoom: 12,
+                mapTypeId: "satellite",
+                panControl: true,
+                panControlOptions: {
+                    position: google.maps.ControlPosition.TOP_RIGHT
+                },
+                zoomControl: true,
+                zoomControlOptions: {
+                    style: google.maps.ZoomControlStyle.LARGE,
+                    position: google.maps.ControlPosition.TOP_left
+                }
+            };
+            map = new google.maps.Map(document.getElementById("map"), option);
+
+            marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                animation: google.maps.Animation.DROP,
+                position: { lat: 0, lng: 0 }
+            });
+
+            var onChangeHandler = function () {
+                DisplayPoint(map);
+            };
+
+            function DisplayPoint(map) {
+                var lat = $("#latitude").val();
+                var lng = $("#longitude").val();
+                var latLng = new google.maps.LatLng(lat, lng);
+                marker.setPosition(latLng);
+                map.panTo(latLng);
+
+            }
+
+        }
+    </script>
+}

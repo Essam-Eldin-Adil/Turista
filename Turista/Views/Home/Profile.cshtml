@@ -1,0 +1,107 @@
+﻿@model Turista.Data.Identity.User
+@{
+    ViewData["Title"] = lang.Profile;
+}
+<!-- Page Title
+        ============================================= -->
+<section id="page-title" class="page-title-parallax page-title-dark page-title-center include-header include-topbar" style="background: url('@Url.Content("~/Images/user-profile-bg.jpg")') no-repeat center center / cover; padding: 110px 0;" data-center="background-position: 0px -100px;" data-top-bottom="background-position:0px 200px;">
+
+    <div class="container clearfix">
+        <h1>@lang.Profile</h1>
+    </div>
+
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%; z-index:1;">
+        <div class="video-overlay" style="background: rgba(0,0,0,0.2);"></div>
+    </div>
+
+</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+    <div class="content-wrap">
+        <div class="container clearfix">
+
+            <div class="row clearfix">
+
+                <div class="col-md-9">
+
+                    <img src="@Url.Content("~/"+Domain.File.GetImage(context,Model.Image))" class="alignleft img-circle img-thumbnail my-0" alt="Avatar" style="max-width: 84px;">
+
+                    <div class="heading-block border-0">
+                        <h3>@Model.FirstName @Model.LastName</h3>
+                        <span>@Model.PhoneNumber</span>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="row clearfix">
+
+                        <div class="col-lg-12">
+
+                            <form asp-action="SaveProfile" method="post" enctype="multipart/form-data">
+                                <input type="hidden" asp-for="Id" class="form-control" />
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="FirstName" class="control-label"></label>
+                                        <input asp-for="FirstName" class="form-control" />
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="LastName" class="control-label"></label>
+                                        <input asp-for="LastName" class="form-control" />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="Email" class="control-label"></label>
+                                        <input asp-for="Email" class="form-control" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="PhoneNumber" class="control-label"></label>
+                                        <div class="input-group">
+                                            <select class="custom-select required" name="realestate-enquiry-idd" id="key" style="max-width: 80px;">
+                                                <option value="+218">+218</option>
+                                            </select>
+                                            <input id="phone" value="@Model.PhoneNumber.Substring(4,9)" class="form-control" />
+                                        </div>
+                                        <div class="alert alert-primary mt-3">
+                                            @lang.phoneNumberDescription
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Image" class="control-label"></label>
+                                    <input type="file" name="image" class="form-control" />
+                                    <span asp-validation-for="Image" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" value="@lang.Save" class="w-100 button button-circle button-blue" />
+                                </div>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="w-100 line d-block d-md-none"></div>
+
+                <div class="col-md-3">
+
+                    <div class="list-group">
+                        <a href="~/Reservations/MyReservations" class="list-group-item list-group-item-action d-flex justify-content-between"><div>@lang.MyReservations</div><i class="icon-calendar-1 text-primary"></i></a>
+                        <a href="~/Home/Fiverates" class="list-group-item list-group-item-action d-flex justify-content-between"><div>@lang.MyFiverates</div><i class="icon-heart text-danger"></i></a>
+                        <a href="~/Accounts/Logout" class="list-group-item list-group-item-action d-flex justify-content-between"><div>@lang.Logout</div><i class="icon-line2-logout"></i></a>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section><!-- #content end -->

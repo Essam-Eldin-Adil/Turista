@@ -1,0 +1,17 @@
+﻿<div class="row" id="login-content">
+    <div class="col-12 form-group">
+        <div class="text-danger">
+            @Model
+            </div>
+        <label for="realestate-enquiry-phone">@lang.PhoneNumber:</label>
+        <div class="input-group">
+            <select class="custom-select required" name="realestate-enquiry-idd" id="key" style="max-width: 80px;">
+                <option value="+218">+218</option>
+            </select>
+            <input type="number" id="phoneNumber" class="form-control required" value="" placeholder="02-232-2424">
+        </div>
+    </div>
+    <div class="col-12 form-group">
+        <button class="button button-3d button-black m-0" onclick="CheckPhoneNumber()" type="button" id="login-button">@lang.Login</button>
+    </div>
+</div>

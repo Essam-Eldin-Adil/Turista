@@ -1,0 +1,76 @@
+/* ----------------------------------------------------------------
+	Fonts
+
+	Replace your Fonts as necessary
+-----------------------------------------------------------------*/
+@font-face {
+	font-family: 'Tajawal';
+	font-weight: normal;
+	/*src: url('../fonts/DINNextLTArabic-Regular.ttf') format('truetype');*/
+	/*src: url('../fonts/arbfonts-thesans-plain.otf') format('opentype');*/
+	src: url('fonts/Tajawal-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Tajawal-bold';
+	font-weight: normal;
+	/*src: url('../fonts/DINNextLTArabic-Regular.ttf') format('truetype');*/
+	/*src: url('../fonts/arbfonts-thesans-plain.otf') format('opentype');*/
+	src: url('fonts/Tajawal-Bold.ttf') format('truetype');
+}
+
+
+body,
+small,
+.sub-menu-container .menu-item > .menu-link,
+.wp-caption,
+.fbox-center.fbox-italic p,
+.skills li .progress-percent .counter,
+.nav-tree ul ul a,
+.font-body {
+	font-family: 'Tajawal' !important;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+#logo a,
+.menu-link,
+.mega-menu-style-2 .mega-menu-title > .menu-link,
+.top-search-form input,
+.entry-link,
+.entry.entry-date-section span,
+.button.button-desc,
+.fbox-content h3,
+.tab-nav-lg li a,
+.counter,
+label,
+.widget-filter-links li a,
+.nav-tree li a,
+.wedding-head,
+.font-primary {
+	font-family: 'Tajawal' !important;
+}
+
+
+	.entry-link span,
+	.entry blockquote p,
+	.more-link,
+	.comment-content .comment-author span,
+	.comment-content .comment-author span a,
+	.button.button-desc span,
+	.testi-content p,
+	.team-title span,
+	.before-heading,
+	.wedding-head .first-name span,
+	.wedding-head .last-name span,
+	.font-secondary {
+		font-family: 'Tajawal' !important;
+	}
+.menu-link, .top-links-item a {
+	font-family: 'Tajawal-bold' !important;
+}

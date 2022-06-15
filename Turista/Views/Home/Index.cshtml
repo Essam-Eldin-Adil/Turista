@@ -1,0 +1,318 @@
+﻿
+@{
+    var cities = (List<Turista.Data.Properties.City>)ViewBag.Cities;
+    Layout= "~/Views/Shared/_LayoutSlider.cshtml";
+}
+@section css{
+    @*<link rel="stylesheet" href="~/css/components/datepicker.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/components/timepicker.css" type="text/css" />*@
+    <style>
+        .owl-carousel .owl-item img {
+            transform-style: preserve-3d;
+            border-radius: 40px 40px !important;
+        }
+
+        .real-estate-item-image::before {
+            border-radius: 30px !important;
+        }
+
+        .owl-stage {
+            direction: @HttpContextAccessor.HttpContext?.Session.GetString("LanguageDirection").ToLower()
+        }
+    </style>
+}
+<!-- Document Wrapper
+============================================= -->
+<!-- Slider
+============================================= -->
+<section id="slider" class="slider-element min-vh-60 min-vh-md-100 dark include-header include-topbar">
+    <div class="slider-inner">
+
+        <div class="fslider h-100 position-absolute" data-speed="3000" data-pause="7500" data-animation="fade" data-arrows="false" data-pagi="false" style="background-color: #333;">
+            <div class="flexslider">
+                <div class="slider-wrap">
+                    <div class="slide" style="background: url('@Url.Content("~/demos/real-estate/images/hero/3.jpg")') center center; background-size: cover;"></div>
+                    <div class="slide" style="background: url('@Url.Content("~/demos/real-estate/images/hero/4.jpg")') center center; background-size: cover;"></div>
+                    <div class="slide" style="background: url('@Url.Content("~/demos/real-estate/images/hero/5.jpg")') center center; background-size: cover;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vertical-middle">
+            <div class="container text-center">
+                <div class="emphasis-title m-0">
+                    <h1>@lang.SearchFor</h1>
+                    <span class="font-weight-light text-uppercase" style="font-size: 20px;color: rgba(255,255,255,0.9);">@lang.SearchForChaletsRestOther</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-wrap">
+            <div class="video-overlay real-estate-video-overlay"></div>
+        </div>
+
+    </div>
+</section><!-- #slider end -->
+
+<div class="tabs advanced-real-estate-tabs clearfix">
+
+    <div class="container clearfix">
+        <ul class="tab-nav clearfix">
+            <li><a href="#tab-properties" data-scrollto="#tab-properties" data-offset="133">@lang.SearchProperties</a></li>
+        </ul>
+    </div>
+
+    <div class="tab-container">
+        <div class="container clearfix">
+            <div class="tab-content clearfix" id="tab-properties">
+                <form asp-action="Search" asp-controller="Home" method="get" class="mb-0 was-validated">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 col-12 bottommargin-sm">
+                            <label for="">@lang.City</label>
+                            <select name="Cities" id="city" required="" class="selectpicker form-control" multiple data-live-search="true" data-size="6" style="width:100%;">
+                                <option value="@Guid.Empty">@lang.SeeAll</option>
+                                @foreach (var item in cities)
+                                {
+                                    <option value="@item.Id">@item.CityName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-12 bottommargin-sm">
+                            <label for="">@lang.PropertyType</label>
+                            <select name="ProprtyType" id="propType" required="" class="selectpicker form-control" multiple data-size="6" style="width:100%; line-height: 30px;">
+                                <option value="@((int)enums.PropertyType.All)">@lang.SeeAll</option>
+                                <option value="@((int)enums.PropertyType.Chalets)">@lang.Chalets</option>
+                                <option value="@((int)enums.PropertyType.Rest)">@lang.Break</option>
+                                <option value="@((int)enums.PropertyType.Villa)">@lang.Villa</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-12 bottommargin-sm">
+                            <label for="">@lang.Date <span style="font-size:14px" id="dateDesc"></span></label>
+                            <div>
+                                <input type="text" class="form-control" value="@DateTime.Now.ToString("MM/dd/yyyy") - @DateTime.Now.AddDays(1).ToString("MM/dd/yyyy")" id="dateInput" placeholder="@lang.DateFormat-@lang.DateFormat">
+                                <input type="hidden" value="@DateTime.Now.ToString("MM/dd/yyyy")" id="dateCheckIn" name="dateCheckIn">
+                                <input type="hidden" value="@DateTime.Now.AddDays(1).ToString("MM/dd/yyyy")" id="dateCheckOut" name="dateCheckOut">
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-12 clearfix">
+                            <button class="button button-3d button-rounded btn-block m-0" style="margin-top: 35px !important;"><i class="icon-search"></i>@lang.Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<!-- Content
+============================================= -->
+<section id="content">
+    <div class="content-wrap">
+        <div class="container clearfix">
+            <div class="promo promo-dark bg-color bottommargin-lg p-4">
+                <div class="row align-items-center">
+                    <div class="col-12 col-lg">
+                        <h3 class="font-weight-normal ls1">@lang.ReceiveReservationsAndWelcomeGuests</h3>
+                    </div>
+                    <div class="col-12 col-lg-auto mt-4 mt-lg-0">
+                        <a asp-action="ClientLogin" asp-controller="Accounts" class="button button-dark button-large button-rounded m-0">@lang.AddYourPropertyNowWithTrusita</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="heading-block border-bottom-0 mb-3">
+                <h3>@lang.Cities</h3>
+            </div>
+            <div class="real-estate owl-carousel image-carousel carousel-widget bottommargin-lg" style="direction:ltr" data-margin="10" data-nav="true" data-loop="true" data-pagi="false" data-items-xs="1" data-items-sm="1" data-items-md="2" data-items-lg="3" data-items-xl="3">
+                @foreach (var city in cities)
+                {
+                    <div class="oc-item">
+                        <div class="real-estate-item text-left">
+                            <div class="real-estate-item-image">
+                                <a href="~/Home/Search?Cities=@city.Id">
+                                    <img src="@city.ImageUrl" class="shadow" style="height:290px" alt="Image 1">
+                                </a>
+                                <div class="real-estate-item-price">
+                                    @city.CityName
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row col-mb-50">
+                <div class="col-12 heading-block border-bottom-0 mb-3">
+                    <h3>@lang.WhatDoWeProvideForYou</h3>
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    <div class="feature-box fbox-plain">
+                        <div class="fbox-icon">
+                            <a href="#"><i class="icon-percentage"></i></a>
+                        </div>
+                        <div class="fbox-content">
+                            <h3 class="font-weight-normal">@lang.AddYourPropertyNowWithTrusita</h3>
+                            <p>@lang.ReceiveReservationsAndWelcomeGuests.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="feature-box fbox-plain">
+                        <div class="fbox-icon">
+                            <a href="#"><i class="icon-paypal1"></i></a>
+                        </div>
+                        <div class="fbox-content">
+                            <h3 class="font-weight-normal">@lang.SafePaymentMethods</h3>
+                            <p>@lang.MultipleAndSecurePaymentMethods.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="feature-box fbox-plain">
+                        <div class="fbox-icon">
+                            <a href="#"><i class="icon-line2-call-end"></i></a>
+                        </div>
+                        <div class="fbox-content">
+                            <h3 class="font-weight-normal">@lang.CustomerService</h3>
+                            <p>@lang.WeSupportYouThroughoutThWeek.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="feature-box fbox-plain">
+                        <div class="fbox-icon">
+                            <a href="#"><i class="icon-bars"></i></a>
+                        </div>
+                        <div class="fbox-content">
+                            <h3 class="font-weight-normal">@lang.TrustedReviews</h3>
+                            <p>@lang.CertifiedRatingsAndComments.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="feature-box fbox-plain">
+                        <div class="fbox-icon">
+                            <a href="#"><i class="icon-realestate-search"></i></a>
+                        </div>
+                        <div class="fbox-content">
+                            <h3 class="font-weight-normal">@lang.AdvancedAndIntelligentSearch</h3>
+                            <p>@lang.AllKindsSearchYourFingertips.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="feature-box fbox-plain">
+                        <div class="fbox-icon">
+                            <a href="#"><i class="icon-line2-reload"></i></a>
+                        </div>
+                        <div class="fbox-content">
+                            <h3 class="font-weight-normal">@lang.panoramicPhotos</h3>
+                            <p>@lang.SeeFromYourPlacePicturesThatMimicReality.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</section><!-- #content end -->
+@section js{
+    @*<script src="~/js/components/timepicker.js"></script>
+    <script src="~/js/components/datepicker.js"></script>*@
+<script>
+//const { now } = require("../../wwwroot/js/moment-with-locales.js");
+
+
+        $('.component-datepicker.input-daterange').datepicker({
+            autoclose: true,
+
+        });
+
+                    $('#city').on('change', function () {
+                var thisObj = $(this);
+                var isAllSelected = thisObj.find('option[value="00000000-0000-0000-0000-000000000000"]').prop('selected');
+                var lastAllSelected = $(this).data('all');
+                var selectedOptions = (thisObj.val()) ? thisObj.val() : [];
+                var allOptionsLength = thisObj.find('option[value!="00000000-0000-0000-0000-000000000000"]').length;
+
+                console.log(selectedOptions);
+                var selectedOptionsLength = selectedOptions.length;
+
+                if (isAllSelected == lastAllSelected) {
+
+                    if ($.inArray("00000000-0000-0000-0000-000000000000", selectedOptions) >= 0) {
+                        selectedOptionsLength -= 1;
+                    }
+
+                    if (allOptionsLength <= selectedOptionsLength) {
+
+                        thisObj.find('option[value="00000000-0000-0000-0000-000000000000"]').prop('selected', true).parent().selectpicker('refresh');
+                        isAllSelected = true;
+                    } else {
+                        thisObj.find('option[value="00000000-0000-0000-0000-000000000000"]').prop('selected', false).parent().selectpicker('refresh');
+                        isAllSelected = false;
+                    }
+
+                } else {
+                    thisObj.find('option').prop('selected', isAllSelected).parent().selectpicker('refresh');
+                }
+
+                $(this).data('all', isAllSelected);
+            }).trigger('change');
+            $('#propType').on('change', function () {
+                var thisObj = $(this);
+                var isAllSelected = thisObj.find('option[value="0"]').prop('selected');
+                var lastAllSelected = $(this).data('all');
+                var selectedOptions = (thisObj.val()) ? thisObj.val() : [];
+                var allOptionsLength = thisObj.find('option[value!="0"]').length;
+
+                console.log(isAllSelected);
+                var selectedOptionsLength = selectedOptions.length;
+
+                if (isAllSelected == lastAllSelected) {
+
+                    if ($.inArray("0", selectedOptions) >= 0) {
+                        selectedOptionsLength -= 1;
+                    }
+
+                    if (allOptionsLength <= selectedOptionsLength) {
+
+                        thisObj.find('option[value="0"]').prop('selected', true).parent().selectpicker('refresh');
+                        isAllSelected = true;
+                    } else {
+                        thisObj.find('option[value="0"]').prop('selected', false).parent().selectpicker('refresh');
+                        isAllSelected = false;
+                    }
+
+                } else {
+                    thisObj.find('option').prop('selected', isAllSelected).parent().selectpicker('refresh');
+                }
+
+                $(this).data('all', isAllSelected);
+            }).trigger('change');
+
+    $('#dateInput').daterangepicker({
+        "showDropdowns": true,
+        "minYear": @DateTime.Now.Year,
+        "maxYear": @DateTime.Now.AddYears(1).Year,
+        "startDate": "@DateTime.Now.ToString("MM/dd/yyyy")",
+        "endDate": "@DateTime.Now.AddDays(1).ToString("MM/dd/yyyy")",
+        "minDate": "@DateTime.Now.ToString("MM/dd/yyyy")",
+        "drops": "auto",
+        "applyButtonClasses": "btn-success"
+    }, function (start, end, label) {
+        $("#dateCheckIn").val(start.format('MM/DD/YYYY'));
+        $("#dateCheckOut").val(end.format('MM/DD/YYYY'));
+        $("#dateDesc").html('(<span class="text-primary">من</span> ' + new Date(start.format('MM/DD/YYYY')).toLocaleDateString('ar-EG', options) + '<span class="text-primary"> إلى </span> ' + new Date(end.format('MM/DD/YYYY')).toLocaleDateString('ar-EG', options)+')');
+    });
+</script>
+}

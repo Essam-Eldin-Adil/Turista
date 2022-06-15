@@ -1,0 +1,22 @@
+﻿@model Turista.Models.PropertyForDept
+
+
+@foreach (var item in Model.Properties)
+{
+    <div class="col-12 col-md-6 col-lg-6">
+        <partial name="propertyDept" model="@item" />
+    </div>
+}
+
+@if (!Model.Properties.Any())
+{
+    <div class="text-center">
+        <div class="pt-2">
+            <i class="icon-ban" style="font-size:120px"></i>
+        </div>
+        <div class="pt-1">
+            @lang.NoData
+        </div>
+    </div>
+}
+

@@ -1,0 +1,12 @@
+﻿@using Turista.Data
+@using Turista.Data.Identity
+@using Turista.Models
+@using Domain
+@using Turista.Resources
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Identity;
+@inject ApplicationDbContext context
+@inject UserManager<User> _userManager
+@inject IHttpContextAccessor HttpContextAccessor
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Turista

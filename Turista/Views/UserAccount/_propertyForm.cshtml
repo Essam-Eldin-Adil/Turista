@@ -1,0 +1,292 @@
+﻿@model Turista.Data.Properties.Property
+
+<form method="post" class="was-validated card rounded-top border-0 w-100" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @if (Model.PropertyType != (int)enums.PropertyType.Chalets)
+    {
+        <div class="form-group">
+            <label asp-for="PropertyType" class="control-label">@lang.PropertyType</label>
+            <select asp-for="PropertyType" class="form-control">
+                <option value="" selected>@lang.PleaseSelect</option>
+                <option value="@((int)enums.PropertyType.Rest)">@(lang.Break)</option>
+                <option value="@((int)enums.PropertyType.Villa)">@(lang.Villa)</option>
+            </select>
+            <span asp-validation-for="PropertyType" class="text-danger"></span>
+        </div>
+    }
+    else
+    {
+        <input type="hidden" asp-for="PropertyType" />
+    }
+    <div class="form-row">
+        <div class="form-group col-md-7">
+            <label asp-for="PropertyName" class="control-label"></label>
+            <input asp-for="PropertyName" class="form-control" />
+            <span asp-validation-for="PropertyName" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-2">
+            <label asp-for="PropertyCode" class="control-label"></label>
+            <input asp-for="PropertyCode" class="form-control" />
+            <span asp-validation-for="PropertyCode" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-3">
+            <label asp-for="ViewStatus" class="control-label">@lang.ViewStatus</label>
+            <select asp-for="ViewStatus" class="form-control">
+                @if (Model.ViewStatus)
+                {
+                    <option value="true" selected="selected">@lang.ViewStatusShown</option>
+                    <option value="false">@lang.ViewStatusHidden</option>
+                }
+                else
+                {
+                    <option value="true">@lang.ViewStatusShown</option>
+                    <option value="false" selected="selected">@lang.ViewStatusHidden</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="7"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Space" class="control-label">@lang.PropertySpace</label>
+        <input asp-for="Space" class="form-control" />
+        <span asp-validation-for="Space" class="text-danger"></span>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label asp-for="CityId" class="control-label">@lang.City</label>
+            <select required="" asp-for="CityId" class="form-control" asp-items="ViewBag.Cities">
+                <option value="" selected="selected">@lang.PleaseSelect</option>
+            </select>
+            <span asp-validation-for="CityId" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-3">
+            <label asp-for="Region" class="control-label"></label>
+            <input asp-for="Region" class="form-control" />
+            <span asp-validation-for="Region" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-3">
+            <label asp-for="Neighborhood" class="control-label"></label>
+            <input asp-for="Neighborhood" class="form-control" />
+            <span asp-validation-for="Neighborhood" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-3">
+            <label asp-for="Direction" class="control-label">@lang.Direction</label>
+            <select asp-for="Direction" class="form-control">
+                <option value="" selected>@lang.PleaseSelect</option>
+                <option value="@((int)enums.Direction.East)">@(lang.East)</option>
+                <option value="@((int)enums.Direction.West)">@(lang.West)</option>
+                <option value="@((int)enums.Direction.South)">@(lang.South)</option>
+                <option value="@((int)enums.Direction.North)">@(lang.North)</option>
+                <option value="@((int)enums.Direction.Northeast)">@(lang.Northeast)</option>
+                <option value="@((int)enums.Direction.NorthWest)">@(lang.NorthWest)</option>
+                <option value="@((int)enums.Direction.Southeast)">@(lang.Southeast)</option>
+                <option value="@((int)enums.Direction.Southwest)">@(lang.Southwest)</option>
+            </select>
+            <span asp-validation-for="Direction" class="text-danger"></span>
+        </div>
+    </div>
+    @{
+        var similerChalets = new List<Turista.Data.Properties.Property>();
+        if (ViewBag.Similers != null)
+        {
+            similerChalets = (List<Turista.Data.Properties.Property>)ViewBag.Similers;
+        }
+    }
+    @if (Model.PropertyType == (int)enums.PropertyType.Chalets)
+    {
+        <div class="">
+            @if (Model.Id != Guid.Empty)
+            {
+                <button type="button" data-target="#similerChaletModal" data-toggle="modal" class="btn btn-outline-primary"><i class="icon-plus"></i> @lang.AddSimilerChalet</button>
+            }
+            @if (similerChalets.Any())
+            {
+                <h5>@lang.SimilerChalets</h5>
+
+                <table class="table table-bordered">
+                    <tr>
+                        <th>@lang.ChaletName</th>
+                        <th>@lang.UnitCode</th>
+                        <th></th>
+                    </tr>
+                    @foreach (var prop in similerChalets)
+                    {
+                        <tr>
+                            <td>@prop.PropertyName</td>
+                            <td>@prop.PropertyCode</td>
+                            <td>
+                                <a asp-action="Property" asp-route-id="@prop.Id" target="_blank" class="btn btn-sm btn-success">@lang.Edit</a>
+                                <a asp-action="RemoveSimilerProperty" asp-route-id="@prop.Id" class="btn btn-sm btn-danger">@lang.Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+        </div>
+    }
+    <div class="divider divider-center text-black-50">
+        @lang.PaymentInfo <i class="icon-money-bill"></i>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label class="control-label">
+                <input id="chkDayPrice" type="checkbox" onchange="dayPrice($(this).prop('checked'))" />
+                @lang.DayPrice
+            </label>
+            <input asp-for="DayPrice" class="form-control" />
+            <span asp-validation-for="DayPrice" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="DepositAmount" class="control-label">@lang.DepositAmount</label>
+            <input asp-for="DepositAmount" class="form-control" />
+            <span asp-validation-for="DepositAmount" class="text-danger"></span>
+        </div>
+    </div>
+    <h5 class="mt-4">
+        <input type="checkbox" id="chkPricePerDay" onchange="pricePerDay($(this).prop('checked'))" asp-for="@Model.IsDayPrice" />
+        @lang.PricePerDays
+    </h5>
+    <div class="form-row pricePerDayGroup">
+        <div class="form-group col-md-6">
+            <input type="hidden" asp-for="PricePerDays.PropertyId" value="@Model.Id" />
+            <input type="hidden" asp-for="PricePerDays.Id" value="@Model.PricePerDays.Id" />
+            <label asp-for="PricePerDays.Saturday" class="control-label"></label>
+            <input asp-for="PricePerDays.Saturday" class="form-control" />
+            <span asp-validation-for="PricePerDays.Saturday" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="PricePerDays.Sunday" class="control-label"></label>
+            <input asp-for="PricePerDays.Sunday" class="form-control" />
+            <span asp-validation-for="PricePerDays.Sunday" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="PricePerDays.Monday" class="control-label"></label>
+            <input asp-for="PricePerDays.Monday" class="form-control" />
+            <span asp-validation-for="PricePerDays.Monday" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="PricePerDays.Tuesday" class="control-label"></label>
+            <input asp-for="PricePerDays.Tuesday" class="form-control" />
+            <span asp-validation-for="PricePerDays.Tuesday" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="PricePerDays.Wednesday" class="control-label"></label>
+            <input asp-for="PricePerDays.Wednesday" class="form-control" />
+            <span asp-validation-for="PricePerDays.Wednesday" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="PricePerDays.Thursday" class="control-label"></label>
+            <input asp-for="PricePerDays.Thursday" class="form-control" />
+            <span asp-validation-for="PricePerDays.Thursday" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="PricePerDays.Friday" class="control-label"></label>
+            <input asp-for="PricePerDays.Friday" class="form-control" />
+            <span asp-validation-for="PricePerDays.Friday" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="divider divider-center text-black-50">
+        @lang.ReserveCondetionAndPolicy <i class="icon-book1"></i>
+    </div>
+    <h5>@lang.BookingTerms</h5>
+    @if (ViewBag.BookingTerms != null)
+    {
+        foreach (var item in (List<Turista.Data.Reservation.BookingTerm>)ViewBag.BookingTerms)
+        {
+            var ischecked = "";
+            if (Model.PropertyBookingTerms.Any(c => c.BookingTermId == item.Id))
+            {
+                ischecked = "checked=''";
+            }
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" name="Terms[]" type="checkbox" value="@item.Id" @ischecked />
+                    @item.Term
+                </label>
+            </div>
+        }
+    }
+
+    <div class="form-group form-check">
+        <label class="form-check-label">
+            <input class="form-check-input" asp-for="InsuranceCondition" />
+            @lang.thereInsurance <input asp-for="InsuranceAmount" class="form-control" style="width: 100px; display: inline" /> @lang.MostPaid
+        </label>
+    </div>
+
+    <div class="my-3">
+        @lang.PersonsAllowed <input asp-for="AllowedPersons" style="width:100px;display:inline" class="form-control mb-2" /><br />
+        <input asp-for="MoreThanAllowed" />@lang.MaxThanThatMostPay <input asp-for="MoreThanAllowedPrice" style="width:100px;display:inline" class="form-control" /> @lang.ForEveryPerson <input asp-for="MaximumAllowed" style="width:100px;display:inline" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="OtherCondition" class="control-label">@lang.OtherCondition</label>
+        <textarea rows="5" asp-for="OtherCondition" class="form-control"></textarea>
+        <span asp-validation-for="OtherCondition" class="text-danger"></span>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label asp-for="CheckInTime" class="control-label">@lang.CheckInTime</label>
+            <input asp-for="CheckInTime" class="form-control" />
+            <span asp-validation-for="CheckInTime" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="CheckOutTime" class="control-label">@lang.CheckOutTime</label>
+            <input asp-for="CheckOutTime" class="form-control" />
+            <span asp-validation-for="CheckOutTime" class="text-danger"></span>
+        </div>
+    </div>
+
+    <hr />
+    @if (ViewBag.CancellationPolicies != null)
+    {
+        <h5>@lang.CancellationPolicies</h5>
+        @foreach (var item in (List<Turista.Data.Reservation.CancellationPolicy>)ViewBag.CancellationPolicies)
+        {
+            var ischecked = "";
+            if (Model.PropertyCancellationPolicies.Any(c => c.CancellationPolicyId == item.Id))
+            {
+                ischecked = "checked=''";
+            }
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" name="Policies[]" type="checkbox" value="@item.Id" @ischecked />
+                    @item.Policy
+                </label>
+            </div>
+        }
+    }
+
+
+    <div class="divider divider-center text-black-50">
+        @lang.LocationInfo <i class="icon-map-marked"></i>
+    </div>
+    <div class="form-group">
+        <label asp-for="Location" class="control-label">@lang.Location</label>
+        <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <div id="gmap" style="height:300px"></div>
+
+
+    <input type="hidden" asp-for="CompleteStep" />
+    <input asp-for="Longitude" type="hidden" />
+    <input asp-for="Latitude" type="hidden" />
+    <input asp-for="Views" type="hidden" />
+    <input asp-for="ResortId" type="hidden" />
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="IsConfirmed" type="hidden" />
+    <input asp-for="Order" type="hidden" />
+    <input type="hidden" asp-for="IsDeleted" />
+    <input asp-for="CreatedDate" type="hidden" />
+    <div class="form-group mt-2">
+        <input type="submit" value="@lang.Save" class="btn btn-primary" />
+    </div>
+</form>
+

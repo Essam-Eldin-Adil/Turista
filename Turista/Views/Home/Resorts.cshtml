@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewData["Title"] = "Resorts";
+}
+
+<!-- Page Title
+        ============================================= -->
+<section id="page-title" class="page-title-parallax page-title-dark page-title-center include-header include-topbar" style="background: url('@Url.Content("~/demos/real-estate/images/cities/5.jpg")') no-repeat center center / cover; padding: 110px 0;" data-center="background-position: 0px -100px;" data-top-bottom="background-position:0px 200px;">
+
+    <div class="container clearfix">
+        <h2 class="text-white">@lang.TheResorts</h2>
+    </div>
+
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%; z-index:1;">
+        <div class="video-overlay" style="background: rgb(44 62 80 / 88%);"></div>
+    </div>
+
+</section><!-- #page-title end -->
+
+<input type="hidden" id="currentReview" value="0" />
+<input type="hidden" id="totalCount" value="@ViewBag.TotalCount" />
+
+<section id="content">
+    <div class="content-wrap">
+        <div class="container">
+            <div id="PropertyContent">
+
+            </div>
+            <input type="hidden" id="totalCount" value="@ViewBag.TotalCount" />
+            <input type="hidden" id="currentReview" value="0" />
+            @if (ViewBag.TotalCount > 10)
+            {
+                <button id="loadMoreBtn" onclick="GetResorts()" class="button button-circle w-100">@lang.LoadMore</button>
+            }
+        </div>
+    </div>
+</section>
+@section js{
+    <script>
+        GetResorts();
+         function GetResorts() {
+             var totalReviewCount = Number($("#totalCount").val());
+             var currentReview = Number($("#currentReview").val());
+             var view = 10;
+            $.ajax({
+                url: '@Url.Action("getResorts")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: { pageNumber: currentReview }
+            }).then(function (content) {
+                $("#PropertyContent").html(content);
+                currentReview = currentReview + view;
+                $("#currentReview").val(currentReview);
+                if (currentReview >= totalReviewCount) {
+                    $("#loadMoreBtn").fadeOut(0);
+                }
+            });
+    }
+    </script>
+}

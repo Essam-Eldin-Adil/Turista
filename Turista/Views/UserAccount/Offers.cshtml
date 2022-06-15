@@ -1,0 +1,85 @@
+﻿@model Turista.Data.Properties.Property
+@{
+    ViewData["Title"] = lang.TheOffers;
+    Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+}
+<section id="content">
+    <div class="content-wrap p-0 mt-5">
+        <div class="container clearfix">
+            <div id="side-navigation" class="row">
+                <div class="col-md-6 col-lg-4">
+                    <partial name="_menu" model="Model" />
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div id="offers">
+                        <div class="heading-block border-0">
+                            <h3>@ViewBag.Title</h3>
+                            @if (!string.IsNullOrEmpty(Model.PropertyName))
+                            {
+                                <span>@Model.PropertyName</span>
+                            }
+                        </div>
+                        <form asp-action="AddOffer" method="post" class="was-validated">
+                            <input type="hidden" name="PropertyId" value="@Model.Id" />
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="DateFrom" class="control-label"></label>
+                                    <input type="date" name="DateFrom" placeholder="dd/mm/yyyy" required="" value="" class="form-control datepicker" />
+                                    <span validation-for="DateFrom" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="DateTo" class="control-label"></label>
+                                    <input type="date" name="DateTo" placeholder="dd/mm/yyyy" required="" value="" class="form-control datepicker" />
+                                    <span validation-for="DateTo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="Amount" class="control-label"></label>
+                                    <input name="Amount" required="" class="form-control" />
+                                    <span validation-for="Amount" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-3 pt-3">
+                                    <button type="submit" class="btn btn-primary w-100">@lang.Save</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="table-responsive mt-4">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>@lang.From</th>
+                                    <th>@lang.to</th>
+                                    <th>@lang.Amount</th>
+                                    <th></th>
+                                </tr>
+                                @foreach (var modelOffer in Model.Offers)
+                                {
+                                <tr>
+                                    <td>@modelOffer.DateFrom.ToString("dd-MM-yyyy")</td>
+                                    <td>@modelOffer.DateTo.ToString("dd-MM-yyyy")</td>
+                                    <td>@modelOffer.Amount</td>
+                                    <td>
+                                        <a class="btn btn-danger btn-sm" asp-action="RemoveOffer" asp-route-id="@modelOffer.Id" asp-route-propertyId="@modelOffer.PropertyId">
+                                            <i class="icon-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                }
+                                @if (!Model.Offers.Any())
+                                {
+                                <tr>
+                                    <th class="text-center" colspan="4">@lang.NoData</th>
+                                </tr>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section js{
+    <script>
+        $("#propOffer").addClass("ui-tabs-active ui-state-active");
+    </script>
+}

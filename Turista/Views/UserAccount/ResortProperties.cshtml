@@ -1,0 +1,69 @@
+﻿@model List<Turista.Data.Properties.Property>
+    @{
+        ViewData["Title"] = lang.ResortImages;
+        Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+        var resort = (Turista.Data.Resorts.Resort)ViewBag.Resort;
+    }
+    <section id="content">
+        <div class="content-wrap p-0 mt-5">
+            <div class="container clearfix">
+                <div id="side-navigation" class="row">
+                    <div class="col-md-6 col-lg-4">
+                        <partial name="_resortMenu" model="@resort" />
+                    </div>
+                    <div class="col-md-6 col-lg-8">
+                        <div id="chalets">
+                            <div class="heading-block border-0">
+                                <h3>@ViewBag.Title</h3>
+                                @if (!string.IsNullOrEmpty(resort.Name))
+                                {
+                                <span>@resort.Name</span>
+                                }
+                            </div>
+                            <a asp-action="Property" asp-controller="UserAccount" asp-route-ResortId="@resort.Id" asp-route-type="@((int)enums.PropertyType.Chalets)" class="btn btn-primary">@lang.AddUnit</a>
+                            <table class="table table-bordered mt-3">
+                                <tr>
+                                    <th>@lang.Name</th>
+                                    <th>@lang.UnitCode</th>
+                                    <th>@lang.ViewStatus</th>
+                                    <th></th>
+                                </tr>
+                                @foreach (var prop in Model)
+                                {
+                                <tr>
+                                    <td>@prop.PropertyName</td>
+                                    <td>@prop.PropertyCode</td>
+                                    <td>
+                                        @if (prop.ViewStatus)
+                                        {
+                                        <span>@lang.ViewStatusShown</span>
+                                        }
+                                        else
+                                        {
+                                        <span>@lang.ViewStatusHidden</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="Property" asp-route-id="@prop.Id" class="btn btn-success btn-sm">@lang.Details</a>
+                                        <a asp-action="RemoveResortProperty" asp-route-id="@prop.Id" asp-route-ResortId="@prop.ResortId" class="btn btn-danger btn-sm">@lang.Delete</a>
+                                    </td>
+                                </tr>
+                                }
+                            </table>
+
+                            @if (!Model.Any())
+                            {
+                            <div class="text-center">@lang.NoData</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @section js{
+        <script>
+        $("#resortProp").addClass("ui-tabs-active ui-state-active");
+        </script>
+    }

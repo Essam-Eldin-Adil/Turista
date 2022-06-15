@@ -1,0 +1,340 @@
+﻿@model List<Turista.Data.Reservation.Reservation>
+@{
+    ViewData["Title"] = lang.TheReservations;
+    Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+    var resort = (Turista.Data.Resorts.Resort)ViewBag.Resort;
+}
+<section id="content">
+    <div class="content-wrap p-0 mt-5">
+        <div class="container clearfix">
+            <div id="side-navigation" class="row">
+                <div class="col-md-6 col-lg-4">
+                    <partial name="_resortMenu" model="@resort" />
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div id="resortUtilities">
+                            <div class="heading-block border-0">
+                                <h3>@ViewBag.Title</h3>
+                                @if (!string.IsNullOrEmpty(resort.Name))
+                                {
+                                    <span>@resort.Name</span>
+                                }
+                            </div>
+                            <div class="tabs tabs-bb tabs-justify clearfix" id="tab-9">
+
+                                <ul class="tab-nav clearfix">
+                                    <li><a href="#NewReservation"><i class="icon-calendar-plus1 mr-0"></i> @lang.NewReservation</a></li>
+                                    <li><a href="#UpcomingReservations"><i class="icon-calendar-1 mr-0"></i> @lang.UpcomingReservations</a></li>
+                                    <li><a href="#OldReservations"><i class="icon-calendar-check1 mr-0"></i> @lang.OldReservations</a></li>
+                                </ul>
+                                <div class="tab-container">
+                                    <div class="tab-content clearfix" id="NewReservation">
+                                        <div class="col-12 form-group">
+                                            <label for="PropertyId">@lang.Chalet</label>
+                                            <select id="PropertyId" name="PropertyId" class="form-control" asp-items="ViewBag.Properties"></select>
+                                        </div>
+                                            <div class="col-12">
+                                                <label for="">@lang.Date</label>
+                                                <div class="input-daterange component-datepicker input-group">
+                                                    <button onclick="getCalender(@DateTime.Now.Year, @DateTime.Now.Month);" style="border-radius:0" class="btn btn-info" type="button">@lang.ReservationCalender</button>
+                                                    <input autocomplete="off" type="text" id="dateCheckIn" name="dateCheckIn" class="form-control text-left" placeholder="@lang.DateFormat">
+                                                    <div class="input-group-prepend"><div class="input-group-text">@lang.to</div></div>
+                                                    <input autocomplete="off" type="text" id="dateCheckOut" name="dateCheckOut" class="form-control text-left" placeholder="@lang.DateFormat">
+                                                    <button onclick="checkIsReserved()" style="border-radius:0" class="btn btn-primary" type="button">@lang.Ok</button>
+                                                </div>
+                                            </div>
+                                            <div id="reservationForm" class="col-12"></div>
+                                        </div>
+                                        <div class="tab-content clearfix" id="UpcomingReservations">
+                                            @foreach (var reservation in Model.Where(c => c.Status == (int)enums.ReservationStatus.New))
+                                            {
+                                                var image = Domain.Properties.GetPropertyDefaultImage(context, reservation.PropertyId);
+                                                <div class="entry col-12 border">
+                                                    <div class="grid-inner no-gutters">
+                                                        <div class="row pt-3 pb-3">
+                                                            <div class="col-auto">
+                                                                <div class="entry-image mb-0">
+                                                                    <a href=""><img style="width:100px" src="@Url.Content("~/"+image)" onerror="this.onerror = null; this.src = '@Url.Content("~/Images/noimg.jpg")';" alt="Image"></a>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4 col-lg-4 col-sm-12">
+                                                                <div class="entry-title">
+                                                                    <span>@lang.ReservationNumber: </span><b>@reservation.ReservationNumber</b>
+                                                                    <h4>@reservation.Property.PropertyName</h4>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3 col-sm-12 text-right">
+                                                                <a asp-action="Details" asp-route-id="@reservation.Id" target="_blank" class="btn btn-primary btn-sm w-50">@lang.Details</a>
+                                                            </div>
+                                                            <div class="col-md-3 border-left">
+                                                                <div class="row">
+                                                                    <div class="col-12 col-md-8 border-right text-center">
+                                                                        @{
+                                                                            var date = reservation.DateTo - reservation.DateFrom;
+                                                                        }
+                                                                        @if (date.Days > 0)
+                                                                        {
+                                                                            <p class="mb-0">@lang.From @reservation.DateFrom.ToString("dd-MM")</p>
+                                                                            <p class="mb-0">@lang.to @reservation.DateTo.ToString("dd-MM")</p>
+                                                                            <p class="mb-0">@reservation.DateFrom.Year</p>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <h3 class="mb-0">@reservation.DateFrom.ToString("dd")</h3>
+                                                                            <p class="mb-0">@reservation.DateTo.ToString("MM/yyyy")</p>
+                                                                            <p class="mb-0">
+                                                                                @switch (reservation.DateFrom.DayOfWeek)
+                                                                                {
+                                                                                    case DayOfWeek.Friday:
+                                                                                        <span>@lang.Friday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Monday:
+                                                                                        <span>@lang.Monday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Sunday:
+                                                                                        <span>@lang.Monday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Saturday:
+                                                                                        <span>@lang.Saturday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Wednesday:
+                                                                                        <span>@lang.Wednesday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Thursday:
+                                                                                        <span>@lang.Thursday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Tuesday:
+                                                                                        <span>@lang.Tuesday</span>
+                                                                                        break;
+                                                                                    default:
+                                                                                        <span>@lang.Friday</span>
+                                                                                        break;
+                                                                                }
+                                                                            </p>
+                                                                        }
+
+                                                                    </div>
+                                                                    <div class="col-md-4 text-center">
+                                                                        <i style="font-size: 60px;" class="icon-calendar-1 text-lg-center"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="tab-content clearfix" id="OldReservations">
+                                            @foreach (var reservation in Model.Where(c => c.Status != (int)enums.ReservationStatus.New))
+                                            {
+                                                var image = Domain.Properties.GetPropertyDefaultImage(context, reservation.PropertyId);
+                                                <div class="entry col-12 border">
+                                                    <div class="grid-inner no-gutters">
+                                                        <div class="row pt-3 pb-3">
+                                                            <div class="col-auto">
+                                                                <div class="entry-image mb-0">
+                                                                    <a href=""><img style="width:100px" src="@Url.Content("~/"+image)" onerror="this.onerror = null; this.src = '@Url.Content("~/Images/noimg.jpg")';" alt="Image"></a>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4 col-lg-4 col-sm-12">
+                                                                <div class="entry-title">
+                                                                    <span>@lang.ReservationNumber: </span><b>@reservation.ReservationNumber</b>
+                                                                    <h4>@reservation.Property.PropertyName</h4>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3 col-sm-12 text-right">
+                                                                <a asp-action="Details" asp-route-id="@reservation.Id" target="_blank" class="btn btn-primary btn-sm w-50">@lang.Details</a>
+                                                            </div>
+                                                            <div class="col-md-3 border-left">
+                                                                <div class="row">
+                                                                    <div class="col-12 col-md-8 border-right text-center">
+                                                                        @{
+                                                                            var date = reservation.DateTo - reservation.DateFrom;
+                                                                        }
+                                                                        @if (date.Days > 0)
+                                                                        {
+                                                                            <p class="mb-0">@lang.From @reservation.DateFrom.ToString("dd-MM")</p>
+                                                                            <p class="mb-0">@lang.to @reservation.DateTo.ToString("dd-MM")</p>
+                                                                            <p class="mb-0">@reservation.DateFrom.Year</p>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <h3 class="mb-0">@reservation.DateFrom.ToString("dd")</h3>
+                                                                            <p class="mb-0">@reservation.DateTo.ToString("MM/yyyy")</p>
+                                                                            <p class="mb-0">
+                                                                                @switch (reservation.DateFrom.DayOfWeek)
+                                                                                {
+                                                                                    case DayOfWeek.Friday:
+                                                                                        <span>@lang.Friday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Monday:
+                                                                                        <span>@lang.Monday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Sunday:
+                                                                                        <span>@lang.Monday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Saturday:
+                                                                                        <span>@lang.Saturday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Wednesday:
+                                                                                        <span>@lang.Wednesday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Thursday:
+                                                                                        <span>@lang.Thursday</span>
+                                                                                        break;
+                                                                                    case DayOfWeek.Tuesday:
+                                                                                        <span>@lang.Tuesday</span>
+                                                                                        break;
+                                                                                    default:
+                                                                                        <span>@lang.Friday</span>
+                                                                                        break;
+                                                                                }
+                                                                            </p>
+                                                                        }
+
+                                                                    </div>
+                                                                    <div class="col-md-4 text-center">
+                                                                        <i style="font-size: 60px;" class="icon-calendar-1 text-lg-center"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="CalenderModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-content">
+        <div class="modal-body" id="CalenderContent">
+            <div class="events-calendar">
+                <div class="events-calendar-header clearfix">
+                    <h2>@lang.ReservationCalender</h2>
+                    <h3 class="calendar-month-year">
+                        <span id="calendar-month" class="calendar-month"></span>
+                        <span id="calendar-year" class="calendar-year"></span>
+                        <nav>
+                            <span id="calendar-prev" class="calendar-prev"><i class="icon-chevron-left"></i></span>
+                            <span id="calendar-next" class="calendar-next"><i class="icon-chevron-right"></i></span>
+                            <span id="calendar-current" class="calendar-current" title="Got to current date"><i class="icon-reload"></i></span>
+                        </nav>
+                    </h3>
+                </div>
+                <div id="calendar" class="fc-calendar-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section css{
+    <link rel="stylesheet" href="~/css/components/datepicker.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/calendar.css" type="text/css" />
+}
+
+@section js{
+    <script src="~/js/components/datepicker.js"></script>
+    <script src="~/js/jquery.calendario.js"></script>
+    <script>
+            $("#resortReserve").addClass("ui-tabs-active ui-state-active");
+
+            $('.component-datepicker.input-daterange').datepicker({
+            autoclose: true,
+        });
+
+                ///////
+        //Calender
+
+        function getCalender(year, month) {
+            var propertyId = $("#PropertyId").val();
+            $.ajax({
+                url: '@Url.Action("GetReservationCalender")',
+                type: "GET",
+                dataType: "Json",
+                async: true,
+                data: {
+                    propertyId: propertyId,
+                    year: year,
+                    month: month }
+            }).then(function (data) {
+                var dataCal = {};
+                var strData = "";
+                for (let i = 0; i < data.length; i++) {
+                    dataCal[data[i].date] = data[i].description;
+                }
+                cal.setData(dataCal);
+                $("#CalenderModal").modal("show");
+            });
+        }
+
+        var cal = $('#calendar').calendario({
+            onDayClick: function($el, $contentEl, dateProperties) {
+                for (var key in dateProperties) {
+                    console.log(key + ' = ' + dateProperties[key]);
+                }
+            },
+            startIn: 1,
+            caldata: null,
+            weeks: ['@lang.Sunday', '@lang.Monday', '@lang.Tuesday', '@lang.Wednesday', '@lang.Thursday', '@lang.Friday', '@lang.Saturday'],
+            weekabbrs: ['@lang.Sun', '@lang.Mon', '@lang.Tues', '@lang.Wed', '@lang.Thurs', '@lang.Fri', '@lang.Sat'],
+            months: ['@lang.January', '@lang.February', '@lang.March', '@lang.April', '@lang.May', '@lang.June', '@lang.July', '@lang.August', '@lang.September', '@lang.October', '@lang.November', '@lang.December'],
+            monthabbrs: ['@lang.Jan', '@lang.Feb', '@lang.Mar', '@lang.Apr', '@lang.May', '@lang.Jun', '@lang.Jul', '@lang.Aug', '@lang.Sep', '@lang.Oct', '@lang.Nov', '@lang.Dec'],
+        });
+        $month = $('#calendar-month').html(cal.getMonthName()),
+            $year = $('#calendar-year').html(cal.getYear());
+
+        $('#calendar-next').on('click',
+            function() {
+                cal.gotoNextMonth(updateMonthYear);
+
+            });
+        $('#calendar-prev').on('click',
+            function() {
+                cal.gotoPreviousMonth(updateMonthYear);
+            });
+        $('#calendar-current').on('click',
+            function() {
+                cal.gotoNow(updateMonthYear);
+            });
+
+        function updateMonthYear() {
+            $month.html(cal.getMonthName());
+            $year.html(cal.getYear());
+            getCalender(cal.getYear(), cal.getMonth());
+        };
+
+        function selectDate(date, dateTo) {
+            date = date.replaceAll("-", "/");
+            dateTo = dateTo.replaceAll("-","/");
+            $("#dateCheckIn").val(date);
+            $("#dateCheckOut").val(dateTo);
+            checkIsReserved();
+            $("#CalenderModal").modal("hide");
+
+        }
+             function checkIsReserved() {
+            var propertyId = $("#PropertyId").val();
+            var checkIn = $("#dateCheckIn").val();
+            var checkOut = $("#dateCheckOut").val();
+            $.ajax({
+                url: '@Url.Action("IsReserved")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: {
+                    propertyId: propertyId,
+                    checkIn: checkIn,
+                    checkOut: checkOut }
+            }).then(function (data) {
+                $("#reservationForm").html(data);
+            });
+        }
+    </script>
+}

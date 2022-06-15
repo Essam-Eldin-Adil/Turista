@@ -1,0 +1,37 @@
+﻿@model Turista.Data.General.ContactUs
+<h3>@lang.ContactInfo</h3>
+<h5>@lang.CustomerService - @lang.ForReservation: @Domain.Settings.Get(context).ReservationPhoneNumber</h5>
+<h5>@lang.From:@Domain.Settings.Get(context).CustomerServiceFrom - @lang.to:@Domain.Settings.Get(context).CustomerServiceTo</h5>
+<h5>@lang.ContactWithUsBy @Domain.Settings.Get(context).ContactPhone</h5>
+<h5><i class="icon-map-marker"></i> @lang.Address</h5>
+<h5>@Domain.Settings.Get(context).OfficeAddress</h5>
+
+<h3>@lang.ContactForm</h3>
+
+<form asp-action="ContactUs" class="was-validated" method="post">
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label asp-for="Name">@lang.Name</label>
+            <input asp-for="Name" required="" class="form-control" />
+            <span asp-validation-for="Name"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label asp-for="Email">@lang.Email</label>
+            <input type="email" asp-for="Email" required="" class="form-control" />
+            <span asp-validation-for="Email"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Subject">@lang.Subject</label>
+        <input asp-for="Subject" required="" class="form-control" />
+        <span asp-validation-for="Subject"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Message">@lang.Message</label>
+        <textarea asp-for="Message" required="" rows="10" class="form-control"></textarea>
+        <span asp-validation-for="Message"></span>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">@lang.Send</button>
+    </div>
+</form>

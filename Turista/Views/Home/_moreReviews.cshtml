@@ -1,0 +1,69 @@
+﻿@model List<Turista.Data.Properties.Review>
+    @foreach (var review in Model)
+    {
+        var rate = (review.Cleaning + review.Crew + review.PropertyCondition) / 3;
+        if (rate + "" == double.NaN.ToString())
+        {
+            rate = 0;
+        }
+    <li class="comment byuser comment-author-_smcl_admin even thread-odd thread-alt depth-1" id="li-comment-2">
+        <div id="comment-2" class="comment-wrap clearfix">
+            <div class="comment-meta">
+                <div class="comment-author vcard">
+                    <span class="comment-avatar clearfix">
+                        <object data="@Url.Content("~/images/no-user-image.png")" class='avatar avatar-60 photo' height='60' width='60' type="image/png">
+                            <img alt='Image' src='@Url.Content("~/"+review.User.Image)' class='avatar avatar-60 photo' height='60' width='60' />
+                        </object>
+                    </span>
+                </div>
+            </div>
+
+            <div class="comment-content clearfix">
+                <div class="comment-author"><span class='url'>@review.User.FirstName @review.User.LastName</span><span><a href="#" title="Permalink to this comment">@review.CreatedDate.ToLongDateString()</a></span></div>
+
+                <p>@review.Comment</p>
+
+                <div class="mystars">
+                    <span class="badge badge-warning">
+                        @string.Format("{0:N1}", rate)
+                    </span>
+                </div>
+            </div>
+            <div class="clear"></div>
+            @if (review.Replyeds.Any())
+            {
+            <ul class='children'>
+                @foreach (var replay in review.Replyeds)
+                {
+                <li class="comment byuser comment-author-_smcl_admin odd alt depth-2" id="li-comment-3">
+                    <div id="comment-3" class="comment-wrap clearfix">
+                        <div class="comment-meta">
+                            <div class="comment-author vcard">
+                                <span class="comment-avatar clearfix">
+                                    <object data="@Url.Content("~/images/no-user-image.png")" class='avatar avatar-40 photo' height='40' width='40' type="image/png">
+                                        <img alt='Image' src='@Url.Content("~/"+File.GetImage(context,(Guid)replay.User.Image))' class='avatar avatar-40 photo' height='40' width='40' />
+                                    </object>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="comment-content clearfix">
+                            <div class="comment-author">
+                                <span rel='external nofollow' class='url'>@replay.User.FirstName @replay.User.LastName - <i class="text-primary">@lang.PropertyOwner</i></span>
+                                <span><span title="Permalink to this comment">@replay.CreatedDate.ToLongDateString()</span></span>
+                            </div>
+                            <p>@replay.Comment</p>
+                            @*@if (review.UserId==)
+                            {
+
+                            }*@
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </li>
+                }
+            </ul>
+            }
+        </div>
+    </li>
+
+    }

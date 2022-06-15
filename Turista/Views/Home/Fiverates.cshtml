@@ -1,0 +1,46 @@
+﻿@model List<Turista.Data.Properties.Fiverate>
+@{
+    ViewData["Title"] = lang.MyFiverates;
+}
+
+<!-- Page Title
+        ============================================= -->
+<section id="page-title" class="page-title-parallax page-title-dark page-title-center include-header include-topbar" style="background: url('@Url.Content("~/demos/real-estate/images/about-us/1.jpg")') no-repeat center center / cover; padding: 110px 0;" data-center="background-position: 0px -100px;" data-top-bottom="background-position:0px 200px;">
+
+    <div class="container clearfix">
+        <h1>@lang.MyFiverates</h1>
+    </div>
+
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%; z-index:1;">
+        <div class="video-overlay" style="background: rgba(0,0,0,0.2);"></div>
+    </div>
+
+</section><!-- #page-title end -->
+<section id="content">
+    <div class="content-wrap">
+        <div class="container">
+            <h3>@lang.MyFiverates</h3>
+            <div class="row">
+                @foreach (var item in Model)
+                {
+
+                    <div class="real-estate-item portfolio-item mb-5 col-12 col-md-6 col-lg-4">
+                        <partial name="property" model="@item.Property" />
+                        <a href="~/Home/RemoveFivrate/@item.PropertyId" class="btn btn-outline-success w-100"><i class="icon-trash text-danger"></i> @lang.RemoveFromFive</a>
+                    </div>
+                }
+            </div>
+            @if (!Model.Any())
+            {
+                <div class="text-center">
+                    <div class="pt-2">
+                        <i class="icon-ban" style="font-size:120px"></i>
+                    </div>
+                    <div class="pt-1">
+                        @lang.NoData
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

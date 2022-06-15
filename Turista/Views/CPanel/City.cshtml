@@ -1,0 +1,52 @@
+﻿@model CityViewModel
+@{
+    ViewData["Title"] = "Users";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@if (Model.City.Id == Guid.Empty)
+{
+    <h4>@lang.AddNew</h4>
+}
+else
+{
+    <h4>@lang.Edit | @Model.City.CityName</h4>
+
+}
+<form asp-action="SaveCity" method="post" class="was-validated" enctype="multipart/form-data">
+    <input type="hidden" asp-for="City.Id" />
+    <div class="form-group">
+        <label asp-for="City.CityName"></label>
+        <input type="text" asp-for="City.CityName" class="form-control" required="" />
+    </div>
+    <img alt="@lang.Image" src="@Url.Content("~/"+Domain.File.GetImage(context,Model.City.Image))" class="img-thumbnail w-25 d-block">
+
+    <div class="form-group mt-3">
+        <label asp-for="City.Image"></label>
+        <input asp-for="City.Image" name="formFiles[]" type="file" class="file" data-show-upload="false" data-show-caption="true" data-show-preview="true">
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">@lang.Save</button>
+    </div>
+</form>
+
+@section js
+{
+    <script>
+        updateMenu("cities");
+
+        function updateCityTranslation(id, name,langId) {
+            $("#myModalLabel").html('@lang.Edit :' + name);
+            $("#CityTranslation_Id").val(id);
+            $("#CityTranslation_CityName").val(name);
+            $("#CityTranslation_LanguageId").val(langId);
+            $("#myModal").modal("show");
+        }
+
+        function addCityTranslation() {
+            $("#myModalLabel").html('@lang.Edit');
+            $("#CityTranslation_Id").val("");
+            $("#CityTranslation_Name").val("");
+            $("#myModal").modal("show");
+        }
+    </script>
+}

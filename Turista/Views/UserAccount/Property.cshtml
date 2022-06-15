@@ -1,0 +1,203 @@
+﻿@model Turista.Data.Properties.Property
+@{
+    if (string.IsNullOrEmpty(Model.PropertyName))
+    {
+        ViewBag.Title = lang.NewProperty;
+    }
+    else
+    {
+        ViewBag.Title = Model.PropertyName;
+    }
+    Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+}
+
+<section id="content">
+    <div class="content-wrap p-0 mt-5">
+        <div class="container clearfix">
+            <div id="side-navigation" class="row">
+                <div class="col-md-6 col-lg-4">
+                    <partial name="_menu" model="Model" />
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div id="propertyInfo">
+                        @if (Model.PropertyImages.Any())
+                        {
+                            var img = Url.Content("~/" + Domain.Properties.GetPropertyDefaultImage(context, Model.Id));
+                            <img src="@img" class="alignleft img-thumbnail my-0" style="max-width: 84px;">
+                        }
+                        <div class="heading-block border-0">
+                            <h3>@ViewBag.Title</h3>
+                            @if (string.IsNullOrEmpty(Model.PropertyName))
+                            {
+                                <span>@lang.AddNewProperty</span>
+                            }
+                            else
+                            {
+                                <span>@lang.UpdateYourProperty</span>
+                            }
+                        </div>
+                        <partial name="_propertyForm" model="Model" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Modal -->
+<div class="modal fade" id="similerChaletModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="SimillerProperty" method="post" class="modal-content was-validated">
+                <div class="modal-header">
+                    <h5 class="modal-title">@lang.AddSimilerChalet</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <input type="hidden" name="propertyId" value="@Model.Id" />
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="control-label">
+                            @lang.SimilerChaletCount
+                        </label>
+                        <input type="number" name="count" required="" class="form-control" id="count" />
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Close</button>
+                    <button type="submit" class="btn btn-primary">@lang.OkSure</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section js{
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMvk54X0cJtOPiSu60rk-OdX8alzz7Htk&callback=initMap"
+            type="text/javascript"></script>
+
+
+    <script>
+
+        $("#propInfo").addClass("ui-tabs-active ui-state-active");
+
+        function closeToSea(isClose) {
+            if (isClose) {
+                $("#seaArea").removeClass("d-none");
+            } else {
+                $("#seaArea").addClass("d-none");
+            }
+        }
+
+
+
+        let map, infoWindow;
+
+
+        function initMap() {
+            //image = 'http://maps.google.com/mapfiles/kml/paddle/wht-circle.png';
+            var option = {
+                center: { lat: 0, lng: 0 },
+                zoom: 12,
+                mapTypeId: "satellite",
+                panControl: true,
+                panControlOptions: {
+                    position: google.maps.ControlPosition.TOP_RIGHT
+                },
+                zoomControl: true,
+                zoomControlOptions: {
+                    style: google.maps.ZoomControlStyle.LARGE,
+                    position: google.maps.ControlPosition.TOP_left
+                }
+            };
+            map = new google.maps.Map(document.getElementById("gmap"), option);
+
+            var postion = new google.maps.LatLng(0, 0);
+            if ($("#Latitude").val() !== "") {
+                var l = (Number($("#Latitude").val())).toFixed(5);
+                var n = (Number($("#Longitude").val())).toFixed(5);
+                postion = new google.maps.LatLng(l, n);
+                console.log(new google.maps.LatLng(l, n));
+                var marker = new google.maps.Marker({
+                    map: map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP,
+                    position: postion
+                });
+                marker.setPosition(postion);
+                map.panTo(postion);
+            } else {
+                var marker = new google.maps.Marker({
+                    map: map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP,
+                    position: { lat: 0, lng: 0 },
+                });
+            }
+
+
+
+            var infowindow = new google.maps.InfoWindow();
+            google.maps.event.addListener(map, 'click', function (event) {
+                //alert(event.latLng.lat());
+                //$('.MapLon').val(event.latLng.lng());
+                infowindow.close();
+                moveMarker(event.latLng.lat(), event.latLng.lng());
+            });
+
+            function moveMarker(lat, lng) {
+                var latlng = new google.maps.LatLng(lat, lng);
+                //marker.setIcon(image);
+                marker.setPosition(latlng);
+                infowindow.setContent(latlng + "");
+                infowindow.open(map, marker);
+                $("#Latitude").val(lat);
+                $("#Longitude").val(lng);
+            }
+        }
+
+
+
+        function dayPrice(isDayPrice) {
+            //alert(isDayPrice);
+            if (isDayPrice) {
+                $("#chkPricePerDay").val('false');
+                $("#DayPrice").removeAttr("readonly");
+                $(".pricePerDayGroup input").prop("readonly", "readonly");
+                document.getElementById('chkPricePerDay').checked = false;
+                document.getElementById('chkDayPrice').checked = true;
+            } else {
+                $("#DayPrice").prop("readonly", "readonly");
+                $(".pricePerDayGroup input").removeAttr("readonly");
+
+                document.getElementById('chkPricePerDay').checked = true;
+                document.getElementById('chkDayPrice').checked = false;
+            }
+        }
+
+        function pricePerDay(isPricePerDay) {
+            if (isPricePerDay) {
+                $("#chkPricePerDay").val('true');
+                document.getElementById('chkPricePerDay').checked = true;
+                document.getElementById('chkDayPrice').checked = false;
+                $("#DayPrice").prop("readonly", "readonly");
+                $(".pricePerDayGroup input").removeAttr("readonly");
+            } else {
+                $("#DayPrice").removeAttr("readonly");
+                $(".pricePerDayGroup input").prop("readonly", "readonly");
+                document.getElementById('chkDayPrice').checked = true;
+                document.getElementById('chkPricePerDay').checked = false;
+
+            }
+        }
+
+        if ('@Model.IsDayPrice.ToString().ToLower()' == 'true') {
+            pricePerDay(true);
+        } else {
+            pricePerDay(false);
+        }
+    </script>
+}

@@ -1,0 +1,241 @@
+﻿@model Turista.Models.SingleResortViewModel
+@{
+    ViewBag.Title = lang.BestChalet;
+    var type = (int)enums.PropertyType.Chalets;
+    var images = Model.Resort.ResortImages.OrderBy(c => c.IsPrimary).ToList();
+    var bgImage = "~/Images/resort-bg.jpg";
+    var primaryImage = "";
+    var secImages = new List<string>();
+    if (images.Count > 0)
+    {
+        primaryImage = Url.Content("~/" + images.FirstOrDefault(c => c.IsPrimary).File.FileContent);
+        primaryImage = primaryImage.Replace("\\", "/");
+        foreach (var item in images.Where(c => !c.IsPrimary).Take(4))
+        {
+            var img = Url.Content("~/" + item.File.FileContent);
+            img = img.Replace("\\", "/");
+            secImages.Add(img);
+        }
+    }
+
+}
+
+@section css{
+    <link href="~/css/jquery-ui.min.css" rel="stylesheet" />
+    <link href="~/css/jquery.comiseo.daterangepicker.css" rel="stylesheet" />
+    <style>
+        .primary-Image {
+            height: 450px;
+            background-size: cover;
+        }
+
+        .secondary-image {
+            height: 225px;
+            background-size: cover;
+        }
+    </style>
+}
+<!-- Page Title
+        ============================================= -->
+<!--<section id="slider" class="slider-element dark parallax include-header include-topbar" style="background-image: url('@Url.Content(bgImage)'); background-size: cover; height: 550px;" data-bottom-top="background-position:0px 200px;" data-top-bottom="background-position:0px -200px;">
+    <div class="container clearfix" style="z-index: 2;">
+        <div class="real-estate-info-wrap">
+            <div class="heading-block mb-0 border-bottom-0 d-md-flex d-block align-items-center justify-content-between">
+                <h2 class="mr-auto">
+                    @Model.Resort.Name
+
+                </h2>
+                <div class="d-flex flex-shrink-1" data-lightbox="gallery">
+                    @foreach (var item in images)
+                    {
+                        if (images.IndexOf(item) == 0)
+                        {
+                            <a href="@Url.Content("~/"+item.File.FileContent)" class="button button-color button-rounded nott m-0 font-weight-medium align-self-end" data-lightbox="gallery-item"><i class="icon-picture"></i> @lang.ViewGallery</a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Content("~/"+item.File.FileContent)" class="d-none" data-lightbox="gallery-item"></a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%;z-index: 1">
+        <div class="video-overlay" style="background: linear-gradient(180deg,rgba(0,0,0,.3) 0,transparent 0%,transparent 0%,rgb(44 62 80))"></div>
+    </div>
+</section>-->
+<!-- #page-title end -->
+
+
+<section id="content">
+    <div class="content-wrap">
+        <div class="container clearfix single-post mb-0">
+            <div class="entry-title">
+                <h2>@Model.Resort.Name</h2>
+            </div>
+            <!-- Entry Meta
+                ============================================= -->
+            <div class="entry-meta">
+                <ul>
+                    <li><i class="icon-map-marked-alt text-danger"></i> <a href="#">@Model.Resort.City.CityName</a>, <a href="#">@Model.Resort.Region</a></li>
+
+                    @if (Model.Resort.CloseToSea)
+                    {
+                        <li>
+                            <a href="#">
+                                <i class="icon-umbrella-beach text-warning"></i>
+
+                                <span>@lang.ResortCloseToSea @Model.Resort.DistanceFromSea @lang.meterSq</span>
+                            </a>
+                        </li>
+                    }
+                    <li>
+                        <a href="#">
+                            <i class="icon-line2-map text-primary"></i>
+                            @lang.Direction:
+                            @switch (Model.Resort.Direction)
+                            {
+                                case (int)enums.Direction.East:
+                                    <span>@lang.East</span>
+                                    break;
+                                case (int)enums.Direction.South:
+                                    <span>@lang.South</span>
+                                    break;
+                                case (int)enums.Direction.West:
+                                    <span>@lang.West</span>
+                                    break;
+                                case (int)enums.Direction.North:
+                                    <span>@lang.North</span>
+                                    break;
+                                case (int)enums.Direction.Northeast:
+                                    <span>@lang.Northeast</span>
+                                    break;
+                                case (int)enums.Direction.NorthWest:
+                                    <span>@lang.NorthWest</span>
+                                    break;
+                                case (int)enums.Direction.Southeast:
+                                    <span>@lang.Southeast</span>
+                                    break;
+                                case (int)enums.Direction.Southwest:
+                                    <span>@lang.Southwest</span>
+                                    break;
+                                default:
+                                    break;
+                            }
+                        </a>
+                    </li>
+                </ul>
+            </div><!-- .entry-meta end -->
+            <!-- Entry Image
+                        ============================================= -->
+            <div class="row">
+                <div class="col-md-6 col-lg-6 px-1 py-1 position-relative">
+                    <div class="primary-Image" style="background-image:url('@primaryImage');">
+                        <div class="d-flex flex-shrink-1" data-lightbox="gallery">
+                            @foreach (var item in images)
+                            {
+                                if (images.IndexOf(item) == 0)
+                                {
+                                    <a href="@Url.Content("~/"+item.File.FileContent)" class="button button-color button-rounded nott m-0 font-weight-medium viewGallryBtn align-self-end" data-lightbox="gallery-item"><i class="icon-picture"></i> @lang.ViewGallery</a>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Content("~/"+item.File.FileContent)" class="d-none" data-lightbox="gallery-item"></a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 py-1">
+                    <div class="row">
+                        @foreach (var item in secImages)
+                        {
+                            <div class="col-md-6 col-6 col-sm-6 px-1 pb-1">
+                                <div class="secondary-image" style="background-image:url('@item')">
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div><!-- .entry-image end -->
+        </div>
+
+        <div class="container">
+            <div class="postcontent mt-3">
+                @Html.Raw(Model.Resort.Description)
+                @foreach (var group in Model.ParameterGroups.OrderBy(c => c.Order))
+                {
+                    var paramCount = (Model.Resort.ResortParameterValues.Count(c => c.Parameter.ParameterGroupId == group.Id) / 4) + 1;
+                    <h4 class="mb-0 topmargin"><i class="@group.Icon"></i> @group.Name</h4>
+                    <div class="line line-sm mt-1 mb-3"></div>
+                    <div class="row clearfix">
+                        @for (int i = 0; i < paramCount; i++)
+                        {
+                            var skip = i * 4;
+                            <div class="col-md-4">
+                                <ul class="iconlist">
+                                    @foreach (var parameter in Model.Resort.ResortParameterValues.Where(c => c.Parameter.ParameterGroupId == group.Id).Skip(skip).Take(4))
+                                    {
+                                        if (parameter.Parameter.Type == 0)
+                                        {
+                                            <li class="mb-1"><i class="@parameter.Parameter.Icon"></i>@parameter.Parameter.Name: @parameter.Value</li>
+                                        }
+                                        else
+                                        {
+                                            <li class="mb-1"><i class="icon-line2-check"></i>@parameter.Parameter.Name</li>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <hr />
+            <h3>@lang.TheChalets</h3>
+            <div id="PropertyContent" class="row">
+
+            </div>
+            <input type="hidden" id="totalCount" value="@ViewBag.TotalCount" />
+            <input type="hidden" id="currentReview" value="0" />
+            @if (ViewBag.TotalCount > 10)
+            {
+                <button id="loadMoreBtn" onclick="GetDeptProperty(@type)" class="button button-circle w-100">@lang.LoadMore</button>
+            }
+        </div>
+    </div>
+</section>
+
+
+@section js{
+    <script>
+        var view = 10;
+        GetDeptProperty(@type);
+        function GetDeptProperty(type) {
+            var totalReviewCount = Number($("#totalCount").val());
+            var currentReview = Number($("#currentReview").val());
+            var dates = $("#reservedate").val();
+            $.ajax({
+                url: '@Url.Action("getResortProperty")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: { type: type, pageNumber: currentReview,dates:dates,resortId:'@Model.Resort.Id' }
+            }).then(function (content) {
+                if (currentReview == 0) {
+                    $("#PropertyContent").html(content);
+                } else {
+                    $("#PropertyContent").append(content);
+                }
+                currentReview = currentReview + view;
+                $("#currentReview").val(currentReview);
+                if (currentReview >= totalReviewCount) {
+                    $("#loadMoreBtn").fadeOut(0);
+                }
+            });
+        }
+    </script>
+}

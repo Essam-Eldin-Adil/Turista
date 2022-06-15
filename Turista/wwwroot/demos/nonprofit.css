@@ -1,0 +1,84 @@
+/* ----------------------------------------------------------------
+	Canvas: Non-Profit
+-----------------------------------------------------------------*/
+
+/* Root Settings
+-----------------------------------------------------------------*/
+
+/* Custom Header Size
+-----------------------------------------------------------------*/
+
+
+
+/* Carousel
+-----------------------------------------------------------------*/
+.oc-desc {
+	position: absolute;
+	top: 5%;
+	left: 5%;
+	bottom: 16px;
+	background-color: #FFF;
+	padding: 25px;
+	border-radius: 3px;
+	height: 90%;
+	width: 90%;
+}
+.oc-desc  p {
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 5;
+	-webkit-box-orient: vertical;
+}
+
+.oc-desc h3 { font-size: 16px; }
+.oc-desc h3 a { color: #111; }
+
+.oc-desc .skills li .progress::after {
+	content: "\e9e3";
+	font-family: 'font-icons';
+	color: #C6C09C;
+	color: var(--themecolor);
+	position: absolute;
+	right: -8px;
+	top: 50%;
+	transform: translateY( -50% );
+}
+
+.oc-desc .counter.counter-inherit.counter-instant { display: inline-block; }
+
+.oc-desc .skills li .progress-percent {
+	display: inherit;
+	position: relative;
+	background-color: transparent;
+	color: #222;
+	text-shadow: none;
+	font-size: 14px;
+	font-weight: 400;
+	top: -30px;
+	width: 100%;
+	left: 0;
+	height: auto;
+	line-height: inherit;
+	padding: 0;
+	border-radius: 0;
+}
+
+.oc-desc .progress-percent::after, .progress-percent::before { display: none; }
+
+.oc-desc .skills li .progress-percent .counter {
+	display: block;
+	position: relative;
+	white-space: nowrap;
+}
+
+.owl-carousel .owl-item .oc-desc {
+	opacity: 0;
+	transform: scale(0.7);
+	transition: all .3s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+/* .owl-carousel .owl-item:hover .oc-desc, */
+.owl-carousel .owl-item.active.center .oc-desc {
+	opacity: 1;
+	transform: scale(1);
+}

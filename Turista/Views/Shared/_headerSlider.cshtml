@@ -1,0 +1,123 @@
+﻿<!-- Top Bar
+    ============================================= -->
+<div id="top-bar" class="transparent-topbar border-bottom-0">
+    <div class="container clearfix">
+
+        <div class="row justify-content-between">
+            <div class="col-12 col-md-auto">
+                <div class="top-links">
+                    <ul class="top-links-container">
+                        @if (HttpContextAccessor.HttpContext?.Session.GetString("LanguageName") == lang.Arabic)
+                        {
+                            <li class="top-links-item top-bar-highlight">
+                                <a asp-controller="Home" asp-action="ChangeLanguage" asp-route-code="en-US" asp-route-flag="flag-icon-us" asp-route-direction="LTR" asp-route-name="@lang.English">@lang.English <img style="width: 30px;" src="~/images/flags/us.png" alt="@lang.iconLang" /></a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="top-links-item top-bar-highlight">
+                                <a asp-controller="Home" asp-action="ChangeLanguage" asp-route-code="ar-EG" asp-route-flag="flag-icon-sa" asp-route-direction="RTL" asp-route-name="@lang.Arabic">@lang.Arabic <img style="width: 30px;" src="~/images/flags/sa.png" alt="@lang.iconLang" /></a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+                <div class="col-12 col-md-auto">
+
+                    <!-- Top Links
+        ============================================= -->
+                    <div class="top-links">
+                        <ul class="top-links-container">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                var user = await _userManager.GetUserAsync(User);
+                                if (user.UserType == (int)enums.UserType.EndUser)
+                                {
+                                    <li class="top-links-item"><a href="~/Reservations/MyReservations">@lang.MyReservations</a></li>
+                                    <li class="top-links-item"><a href="~/Home/Fiverates">@lang.MyFiverates</a></li>
+                                    <li class="top-links-item">
+                                        <a class="side-panel-trigger" href="#">@_userManager.GetUserAsync(User).Result.FirstName</a>
+                                        <ul class="top-links-sub-menu">
+                                            <li class="top-links-item"><a href="~/Home/Profile">@lang.Profile</a></li>
+                                            <li class="top-links-item"><a href="~/Accounts/Logout">@lang.Logout</a></li>
+                                        </ul>
+                                    </li>
+                                }
+                                else if (user.UserType == (int)enums.UserType.BookAdmin || user.UserType == (int)enums.UserType.BookUser)
+                                {
+                                    <li class="top-links-item"><a asp-controller="UserAccount" asp-action="Properties">@lang.ManageProperties</a></li>
+                                    <li class="top-links-item">
+                                        <a class="side-panel-trigger" href="#">@_userManager.GetUserAsync(User).Result.FirstName</a>
+                                        <ul class="top-links-sub-menu">
+                                            <li class="top-links-item"><a href="~/Home/Profile">@lang.Profile</a></li>
+                                            <li class="top-links-item"><a href="~/Accounts/Logout">@lang.Logout</a></li>
+                                        </ul>
+                                    </li>
+                                }
+                                else if (user.UserType == (int)enums.UserType.Admin)
+                                {
+                                    <li class="top-links-item"><a asp-controller="CPanel" asp-action="Index">@lang.CPanel</a></li>
+                                    <li class="top-links-item">
+                                        <a class="side-panel-trigger" href="#">@_userManager.GetUserAsync(User).Result.FirstName</a>
+                                        <ul class="top-links-sub-menu">
+                                            <li class="top-links-item"><a href="~/Home/Profile">@lang.Profile</a></li>
+                                            <li class="top-links-item"><a href="~/Accounts/Logout">@lang.Logout</a></li>
+                                        </ul>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="top-links-item top-bar-highlight">
+                                    <a href="#">@lang.AddYourProperty</a>
+                                    <div class="top-links-section" style="font-size: 14px;">
+                                        @lang.ReceivingReservations <a asp-action="ClientLogin" asp-controller="Accounts" class="more-link font-secondary" style="border-bottom-style: dotted;">@lang.RegisterYourProperty &rarr;</a>
+                                    </div>
+                                </li>
+                                <li class="top-links-item"><a href="~/Accounts/Login?ReturnUrl=@Context.Request.Path" class="side-panel-trigger1">@lang.Login_Register</a></li>
+                            }
+                        </ul>
+                    </div><!-- .top-links end -->
+
+                </div>
+            </div>
+
+    </div>
+</div><!-- #top-bar end -->
+<!-- Header
+    ============================================= -->
+<header id="header" class="transparent-header dark header-size-md" data-sticky-shrink="false">
+    <div id="header-wrap">
+        <div class="container">
+            <div class="header-row">
+
+                <!-- Logo
+                ============================================= -->
+                <div id="logo">
+                    <a href="~/Home/Index" data-dark-logo="@Url.Content("~/images/logo.png")" class="standard-logo"><img src="~/images/logo.png" alt="Turista Logo"></a>
+                    <a href="~/Home/Index" data-dark-logo="@Url.Content("~/images/logo@2x.png")" class="retina-logo"><img src="~/images/logo@2x.png" alt="Turista Logo"></a>
+                </div><!-- #logo end -->
+
+                <div id="primary-menu-trigger">
+                    <svg class="svg-trigger" viewBox="0 0 100 100"><path d="m 30,33 h 40 c 3.722839,0 7.5,3.126468 7.5,8.578427 0,5.451959 -2.727029,8.421573 -7.5,8.421573 h -20"></path><path d="m 30,50 h 40"></path><path d="m 70,67 h -40 c 0,0 -7.5,-0.802118 -7.5,-8.365747 0,-7.563629 7.5,-8.634253 7.5,-8.634253 h 20"></path></svg>
+                </div>
+
+                <!-- Primary Navigation
+                ============================================= -->
+                <nav class="primary-menu with-arrows">
+                    <ul class="menu-container">
+                        <li class="menu-item current"><a class="menu-link" href="~/Home/Index"><div>@lang.Home</div></a></li>
+                        <li class="menu-item"><a class="menu-link" href="~/Home/Resorts"><div>@lang.Resorts</div></a></li>
+                        <li class="menu-item"><a class="menu-link" href="~/Home/Chalets"><div>@lang.Chalets</div></a></li>
+                        <li class="menu-item"><a class="menu-link" href="~/Home/RestHouses"><div>@lang.Breaks</div></a></li>
+                        <li class="menu-item"><a class="menu-link" href="~/Home/Villas"><div>@lang.Villas</div></a></li>
+                        <li class="menu-item"><a class="menu-link" href="~/Home/Offers"><div>@lang.TheOffers</div></a></li>
+                        <li class="menu-item"><a class="menu-link" href="~/Home/ContactUs"><div>@lang.Contact</div></a></li>
+                    </ul>
+                </nav><!-- #primary-menu end -->
+            </div>
+        </div>
+    </div>
+    <div class="header-wrap-clone"></div>
+</header><!-- #header end -->

@@ -1,0 +1,96 @@
+﻿@model Turista.Models.ReviewViewModel
+<div class="comments topmargin">
+    <h3>
+        @lang.Reviews
+        @if (Model.Property.IsReservedBefore)
+        {
+            <button class="btn btn-warning btn-sm mt-1" data-target="#rateModal" data-toggle="modal"><i class="icon-star3"></i> @lang.AddRateAndComments</button>
+        }
+    </h3>
+    @if (Model.Reviews.Any())
+    {
+        <!-- Comments List
+        ============================================= -->
+        <ol id="commentlist" class="commentlist border-bottom-0 clearfix">
+            @foreach (var review in Model.Reviews)
+            {
+                var rate = (review.Cleaning + review.Crew + review.PropertyCondition) / 3;
+                if (rate + "" == double.NaN.ToString())
+                {
+                    rate = 0;
+                }
+
+                <li class="comment byuser comment-author-_smcl_admin even thread-odd thread-alt depth-1" id="li-comment-2">
+                    <div id="comment-2" class="comment-wrap clearfix">
+                        <div class="comment-meta">
+                            <div class="comment-author vcard">
+                                <span class="comment-avatar clearfix">
+                                    <object data="@Url.Content("~/images/no-user-image.png")" class='avatar avatar-60 photo' height='60' width='60' type="image/png">
+                                        <img alt='Image' src='@Url.Content("~/"+review.User.Image)' class='avatar avatar-60 photo' height='60' width='60' />
+                                    </object>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="comment-content clearfix">
+                            <div class="comment-author"><span class='url'>@review.User.FirstName @review.User.LastName</span><span><a href="#" title="Permalink to this comment">@review.CreatedDate.ToLongDateString()</a></span></div>
+
+                            <p>@review.Comment</p>
+
+                            <div class="mystars">
+                                <span class="badge badge-warning">
+                                    @string.Format("{0:N1}", rate)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        @if (review.Replyeds.Any())
+                        {
+                            <ul class='children'>
+                                @foreach (var replay in review.Replyeds)
+                                {
+                                    <li class="comment byuser comment-author-_smcl_admin odd alt depth-2" id="li-comment-3">
+                                        <div id="comment-3" class="comment-wrap clearfix">
+                                            <div class="comment-meta">
+                                                <div class="comment-author vcard">
+                                                    <span class="comment-avatar clearfix">
+                                                        <object data="@Url.Content("~/images/no-user-image.png")" class='avatar avatar-40 photo' height='40' width='40' type="image/png">
+                                                            <img alt='Image' src='@Url.Content("~/"+replay.User.Image)' class='avatar avatar-40 photo' height='40' width='40' />
+                                                        </object>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="comment-content clearfix">
+                                                <div class="comment-author">
+                                                    <span rel='external nofollow' class='url'>@replay.User.FirstName @replay.User.LastName - <i class="text-primary">@lang.PropertyOwner</i></span>
+                                                    <span><span title="Permalink to this comment">@replay.CreatedDate.ToLongDateString()</span></span>
+                                                </div>
+                                                <p>@replay.Comment</p>
+                                                @*@if (review.UserId==)
+                                                    {
+
+                                                    }*@
+                                            </div>
+                                            <div class="clear"></div>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </li>
+
+            }
+
+        </ol><!-- .commentlist end -->
+        <input type="hidden" id="totalReviewCount" value="@Model.totalReviewCount" />
+        <input type="hidden" id="currentReview" value="@Model.Reviews.Count" />
+        <button id="loadMoreBtn" type="button" class="btn btn-light w-100" onclick="getMoreReviews()">@lang.LoadMore</button>
+
+    }
+    else
+    {
+        <span>@lang.NoCommentsYet</span>
+    }
+
+</div>

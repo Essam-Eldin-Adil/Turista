@@ -1,0 +1,52 @@
+﻿@model Turista.Data.Resorts.Resort
+@{
+    ViewData["Title"] = lang.UtitiltiesAndServices;
+    Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+}
+<section id="content">
+    <div class="content-wrap p-0 mt-5">
+        <div class="container clearfix">
+            <div id="side-navigation" class="row">
+                <div class="col-md-6 col-lg-4">
+                    <partial name="_resortMenu" model="Model" />
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div id="resortUtilities">
+                        <div class="heading-block border-0">
+                            <h3>@ViewBag.Title</h3>
+                            @if (!string.IsNullOrEmpty(Model.Name))
+                            {
+                            <span>@Model.Name</span>
+                            }
+                        </div>
+                        <form method="post" id="resortUtilitiesForm" asp-action="SaveResortUtilities">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    @section js{
+        <script>
+        $("#resortUtil").addClass("ui-tabs-active ui-state-active");
+
+        getresortUtilities();
+        function getresortUtilities() {
+            $("#resortUtilitiesForm").html('@Html.Raw(lang.PleaseWait)');
+            var resortId = '@Model.Id';
+            $.ajax({
+                url: '@Url.Action("GetResortUtilities")',
+                type: "POST",
+                dataType: "html",
+                async: true,
+                data: { resortId: resortId }
+            }).then(function (content) {
+                $("#resortUtilitiesForm").html(content);
+                $("#ResortId").val('@Model.Id');
+            });
+        }
+        </script>
+    }

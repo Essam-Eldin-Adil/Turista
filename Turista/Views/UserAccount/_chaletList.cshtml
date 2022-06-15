@@ -1,0 +1,34 @@
+﻿@model List<Turista.Data.Properties.Property>
+<table class="table table-bordered mt-3">
+    <tr>
+        <th>@lang.Name</th>
+        <th>@lang.UnitCode</th>
+        <th>@lang.ViewStatus</th>
+        <th></th>
+    </tr>
+    @foreach (var prop in Model)
+    {
+<tr>
+    <td>@prop.PropertyName</td>
+    <td>@prop.PropertyCode</td>
+    <td>
+        @if (prop.ViewStatus)
+        {
+            <span>@lang.ViewStatusShown</span>
+        }
+        else
+        {
+            <span>@lang.ViewStatusHidden</span>
+        }
+    </td>
+    <td class="text-center">
+        <a asp-action="Property" asp-route-id="@prop.Id" class="btn btn-success">@lang.Details</a>
+    </td>
+</tr>
+    }
+</table>
+
+@if (!Model.Any())
+{
+    <div class="text-center">@lang.NoData</div>
+}

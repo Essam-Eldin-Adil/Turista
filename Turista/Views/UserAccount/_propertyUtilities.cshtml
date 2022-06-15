@@ -1,0 +1,89 @@
+﻿@model PropertyParameterViewModel
+@{
+    var isChecked = "";
+}
+
+    @foreach (var modelParameterGroup in Model.ParameterGroups.Where(c => !c.IsChild && c.Parameters.Any()).OrderBy(c => c.Order))
+    {
+        <div class="border p-3 my-2">
+            <h5 class="text-muted">@modelParameterGroup.Name</h5>
+            <div class="form-row">
+                @foreach (var parameter in modelParameterGroup.Parameters.OrderBy(c => c.Index).OrderBy(c => c.Type))
+                {
+                    if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                    {
+                        isChecked = "";
+                        if (Model.ParameterValues.Select(c => c.ParameterId).Contains(parameter.Id))
+                        {
+                            isChecked = "checked='checked'";
+                        }
+                        <div class="form-group form-check mr-3">
+                            <label class="form-check-label">
+                                <input class="form-check-input" @isChecked type="checkbox" name="checkboxes[]" value="@parameter.Id" /> @Html.DisplayName(parameter.Name)
+                            </label>
+                        </div>
+                    }
+                    else
+                    {
+                        var value = "";
+                        if (Model.ParameterValues.Select(c => c.ParameterId).Contains(parameter.Id))
+                        {
+                            value = $"{Model.ParameterValues.FirstOrDefault(c => c.ParameterId == parameter.Id)?.Value}";
+                        }
+                        <div class="form-group col-md-3">
+                            <label for="@parameter.Name" class="control-label">@parameter.Name</label>
+                            <input value="@value" type="text" name="inputValues[]" class="form-control" />
+                            <input type="hidden" name="inputIds[]" value="@parameter.Id" />
+                            <span validation-for="Name" class="text-danger"></span>
+                        </div>
+                    }
+
+                }
+            </div>
+            @foreach (var modelParameterGroupItem in Model.ParameterGroups.Where(c => c.ParentId == modelParameterGroup.Id).OrderBy(c => c.Order))
+            {
+                <div class="border p-3 my-2">
+                    <h5 class="text-muted">@modelParameterGroupItem.Name</h5>
+                    <div class="form-row">
+                        @foreach (var parameter in modelParameterGroupItem.Parameters.OrderBy(c => c.Index))
+                        {
+                            if (parameter.Type == (int)enums.ParameterType.Checkbox)
+                            {
+                                isChecked = "";
+                                if (Model.ParameterValues.Select(c => c.ParameterId).Contains(parameter.Id))
+                                {
+                                    isChecked = "checked='checked'";
+                                }
+                                <div class="form-group form-check mr-3">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" @isChecked type="checkbox" name="checkboxes[]" value="@parameter.Id" /> @Html.DisplayName(parameter.Name)
+                                    </label>
+                                </div>
+                            }
+                            else
+                            {
+                                var value = "";
+                                if (Model.ParameterValues.Select(c => c.ParameterId).Contains(parameter.Id))
+                                {
+                                    value = $"{Model.ParameterValues.FirstOrDefault(c => c.ParameterId == parameter.Id)?.Value}";
+                                }
+                                <div class="form-group col-md-3">
+                                    <label for="@parameter.Name" class="control-label">@parameter.Name</label>
+                                    <input value="@value" type="text" name="inputValues[]" class="form-control" />
+                                    <input type="hidden" name="inputIds[]" value="@parameter.Id" />
+                                    <span validation-for="Name" class="text-danger"></span>
+                                </div>
+                            }
+
+                        }
+                    </div>
+                </div>
+
+            }
+        </div>
+    }
+
+<input type="hidden" name="PropertyId" id="PropertyId" />
+<div class="form-group">
+    <input type="submit" value="@lang.Save" class="btn btn-primary" />
+</div>

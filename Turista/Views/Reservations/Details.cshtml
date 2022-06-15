@@ -1,0 +1,168 @@
+﻿@model Turista.Data.Reservation.Reservation
+@{
+    ViewData["Title"] = lang.ReservationNumber + ": " + Model.ReservationNumber;
+    var dir = HttpContextAccessor.HttpContext?.Session.GetString("LanguageDirection") == "RTL" ? "direction:ltr" : "";
+}
+
+<!-- Page Title
+        ============================================= -->
+<section id="page-title" class="page-title-parallax page-title-dark page-title-center include-header include-topbar" style="background: url('@Url.Content("~/demos/real-estate/images/about-us/1.jpg")') no-repeat center center / cover; padding: 110px 0;" data-center="background-position: 0px -100px;" data-top-bottom="background-position:0px 200px;">
+
+    <div class="container clearfix">
+        <h2 class="text-white">@lang.ReservationNumber:@Model.ReservationNumber</h2>
+        <h3 class="text-white-50">@Model.Property.PropertyName</h3>
+    </div>
+
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%; z-index:1;">
+        <div class="video-overlay" style="background: rgba(0,0,0,0.2);"></div>
+    </div>
+
+</section><!-- #page-title end -->
+<section id="content">
+    <div class="content-wrap">
+        <div class="container">
+            <h3>@lang.ReservationNumber:@Model.ReservationNumber</h3>
+            <div class="row clearfix">
+                <div class="col-lg-5">
+                    <div id="oc-images" class="owl-carousel image-carousel carousel-widget custom-js" style="@dir">
+                        @foreach (var item in Model.Property.PropertyImages)
+                        {
+                            <div class="oc-item">
+                                <a href="#"><img src="@Url.Content("~/"+item.File.FileContent)"></a>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="featured-item">
+                        <div class="item-title">
+                            <div class="before-heading">
+                                @if (Model.Status == (int)enums.ReservationStatus.Confirmed)
+                                {
+                                    <span class="badge badge-success">@lang.ReservationConfirmed</span>
+                                }
+                                else if (Model.Status == (int)enums.ReservationStatus.Cancled)
+                                {
+                                    <span class="badge badge-danger">@lang.ReservationCancled</span> <span>@Model.CancelResones</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-warning">@lang.ReservationPending</span>
+                                }
+                            </div>
+                            <h4 class="mb-3">
+                                <a href="~/Home/Unit/@Model.Property.Id">@Model.Property.PropertyName</a>
+                                @if (!string.IsNullOrEmpty(Model.Property.PropertyCode))
+                                {
+                                    <span class="text-dark">(@lang.UnitCode: @Model.Property.PropertyCode)</span>
+                                }
+                            </h4>
+                        </div>
+                        <div class="row">
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.CheckIn:</strong> @Model.DateFrom.ToLongDateString()
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.CheckOut:</strong> @Model.DateTo.ToLongDateString()
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.DayPrice:</strong> @Model.DayPrice @lang.Currency
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.TotalDays:</strong> @Model.TotalDays
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.TotalReservationAmount:</strong> @Model.TotalPrice @lang.Currency
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.TotalPaidAmount:</strong> @Model.Invoices.Sum(c => c.Amount) @lang.Currency
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.FirstName:</strong> @Model.User.FirstName
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.LastName:</strong> @Model.User.LastName
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.PhoneNumber:</strong> @Model.User.PhoneNumber
+                            </div>
+                            <div class="item-meta font-secondary mb-2 col-md-6">
+                                <strong>@lang.WhatsAppNumber:</strong> @Model.User.WhatsAppNumber
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        @if (Model.Status == (int)enums.ReservationStatus.New)
+                        {
+                            <button onclick="$('#ReservationId').val('@Model.Id')" data-target="#cancelReservationModal" data-toggle="modal" class="button button-small bg-danger button-circle m-0 font-secondary">@lang.CancelReservation</button>
+                        }
+                    </div>
+                </div>
+            </div>
+            @if (Model.Invoices.Any())
+            {
+                <div class="topmargin">
+                    <h3>@lang.InvoicesDetails</h3>
+                    @foreach (var item in Model.Invoices)
+                    {
+                        <div class="card card-body mb-2">
+                            <div class="row">
+                                <div class="col-6"><a href="@Url.Content("~/Invoices/"+item.ReservationId+"/"+item.Id+".pdf")" target="_blank"><i class="i-plain icon-download text-primary"></i></a> @item.PaymentDateTime.ToLongDateString()</div>
+                                <div class="col-6 text-right"><strong>@item.Amount @lang.Currency</strong></div>
+                            </div>
+                            @lang.RefNo:@item.RefNo
+                        </div>
+                    }
+
+                    <div class="card card-body mb-2">
+                        <div class="row">
+                            <div class="col-6"><strong>@lang.Total</strong></div>
+                            <div class="col-6 text-right"><strong>@Model.Invoices.Sum(c => c.Amount) @lang.Currency</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="cancelReservationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+            <form asp-action="CancelReservation" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@lang.CancelReservation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <input type="hidden" name="ReservationId" id="ReservationId" />
+                
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label for="cancelResonSelect"></label>
+                        <select id="cancelResonSelect" name="CancelResoun" class="form-control">
+                            <option value="@((int)enums.CanceledReson.CanceledByUser)">@lang.CanceledByUser</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang.Close</button>
+                    <button type="submit" class="btn btn-primary">@lang.OkSure</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section js{ 
+    <script>
+        jQuery(window).on('pluginCarouselReady', function () {
+            // Custom Carousel
+            $('.owl-carousel').owlCarousel({
+                items: 1,
+                dotsContainer: '#item-color-dots',
+                loop: true,
+            });
+        });
+    </script>
+}

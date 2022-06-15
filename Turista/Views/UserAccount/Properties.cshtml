@@ -1,0 +1,250 @@
+﻿@model MyPropretiesViewModels
+@{
+    ViewData["Title"] = lang.MyProperties;
+    Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+}
+
+<!-- Content
+    ============================================= -->
+<section id="content">
+    <div class="content-wrap p-0 mt-5">
+        <div class="container">
+            <h3>@lang.MyProperties</h3>
+            <div class="btn-group">
+                <button class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@lang.NewProperty</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="~/UserAccount/Resort">@lang.Resort</a>
+                    <a class="dropdown-item" href="~/UserAccount/Property?type=@((int)enums.PropertyType.Rest)">@lang.Break</a>
+                    <a class="dropdown-item" href="~/UserAccount/Property?type=@((int)enums.PropertyType.Villa)">@lang.Villa</a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered w-100 mt-2">
+                    <thead>
+                        <tr>
+                            <th>@lang.PropertyName</th>
+                            <th>@lang.PropertyType</th>
+                            <th>@lang.ViewStatus</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @if (Model.Resorts.Any())
+                        {
+                            <tr>
+                                <th colspan="4">
+                                    @lang.Resorts
+                                </th>
+                            </tr>
+                        }
+                        @foreach (var resort in Model.Resorts.Where(c => !c.IsDeleted))
+                        {
+                            var image = Domain.Properties.GetResortDefaultImage(context, resort.Id);
+                            <tr>
+                                <td>
+                                    <a asp-action="Resort" asp-route-id="@resort.Id">
+                                        <img style="width:100px" src="@Url.Content("~/"+image)" onerror="this.onerror = null; this.src = '@Url.Content("~/Images/noimg.jpg")';" alt="Image">
+                                        @resort.Name
+                                    </a>
+                                    @if (!resort.IsConfirmed)
+                                    {
+                                        <span class="badge badge-danger">@lang.NotConfirmed</span>
+                                    }
+                                </td>
+                                <td>
+                                    @lang.Resort
+                                </td>
+                                <td>
+                                    @if (resort.ViewStatus)
+                                    {
+                                        <span class="badge badge-success">@lang.ViewStatusShown</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">@lang.ViewStatusHidden</span>
+                                    }
+                                </td>
+                                <td class="w-25">
+                                    <a asp-action="Resort" asp-route-id="@resort.Id" class="btn btn-primary btn-sm"><i class="icon-building"></i> @lang.ManageUnit</a>
+                                    <a asp-action="RemoveResort" asp-route-id="@resort.Id" class="btn btn-danger btn-sm">@lang.Delete</a>
+                                </td>
+                            </tr>
+                        }
+
+                        @if (Model.Properties.Any())
+                        {
+                            <tr>
+                                <th colspan="4">
+                                    @lang.RestHousesAndVillas
+                                </th>
+                            </tr>
+                        }
+
+                        @foreach (var property in Model.Properties.Where(c => !c.IsDeleted))
+                        {
+                            var image = Domain.Properties.GetPropertyDefaultImage(context, property.Id);
+
+                            <tr>
+                                <td>
+                                    <a asp-action="Property" asp-route-id="@property.Id">
+                                        <img style="width:100px" src="@Url.Content("~/"+image)" onerror="this.onerror = null; this.src = '@Url.Content("~/Images/noimg.jpg")';" alt="Image">
+                                        @property.PropertyName
+                                    </a>
+                                    @if (!property.IsConfirmed)
+                                    {
+                                        <span class="badge badge-danger">@lang.NotConfirmed</span>
+                                    }
+                                </td>
+                                <td>
+                                    @switch (property.PropertyType)
+                                    {
+                                        case (int)enums.PropertyType.Villa:
+                                            <span>@lang.Villa</span>
+                                            break;
+                                        case (int)enums.PropertyType.Rest:
+                                            <span>@lang.Break</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @if (property.ViewStatus)
+                                    {
+                                        <span class="badge badge-success">@lang.ViewStatusShown</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">@lang.ViewStatusHidden</span>
+                                    }
+                                </td>
+                                <td class="w-25">
+                                    <a asp-action="Property" asp-route-id="@property.Id" class="btn btn-primary btn-sm"><i class="icon-building"></i> @lang.ManageUnit</a>
+                                    <a asp-action="RemoveProperty" asp-route-id="@property.Id" class="btn btn-danger btn-sm">@lang.Delete</a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Properties.Any() && !Model.Resorts.Any())
+                        {
+                            <tr>
+                                <th colspan="4">
+                                    @lang.NoData
+                                </th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @*<h2>@lang.TheResorts</h2>
+                <div id="portfolio" class="portfolio row grid-container portfolio-overlay-open no-gutters">
+                    @foreach (var resort in Model.Resorts)
+                    {
+                        <article class="portfolio-item col-12 col-sm-6 col-md-4 col-lg-3 pf-media pf-icons">
+                            <div class="grid-inner">
+                                <div class="portfolio-image">
+                                    <a asp-action="Resort" asp-route-id="@resort.Id" target="_blank">
+                                        <img src="@Url.Content("~/"+Domain.Properties.GetResortDefaultImage(context,resort.Id))" alt="@resort.Name">
+                                        <div class="bg-overlay">
+                                            <div class="bg-overlay-content dark flex-column">
+                                                <div class="portfolio-desc pt-0 center">
+                                                    <h4>@resort.Name</h4>
+                                                </div>
+                                            </div>
+                                            <div class="bg-overlay-bg dark op-ts op-05" data-hover-animate="op-1" data-hover-animate-out="op-05"></div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                    <article class="portfolio-item col-12 col-sm-6 col-md-4 col-lg-3 pf-media pf-icons">
+                        <div class="grid-inner">
+                            <div class="portfolio-image">
+                                <a asp-action="Resort" target="_blank">
+                                    <img src="~/demos/real-estate/images/hero/1.jpg" alt="@lang.NewResorts">
+                                    <div class="bg-overlay">
+                                        <div class="bg-overlay-content dark flex-column">
+                                            <div class="portfolio-desc pt-0 center">
+                                                <h2></h2>
+                                                <h4>
+                                                    <i class="icon-plus-square1"></i>
+                                                    <br />
+                                                    @lang.NewResorts
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <div class="bg-overlay-bg dark op-ts op-05" data-hover-animate="op-1" data-hover-animate-out="op-05"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+
+                <h2>@lang.RestHousesAndVillas</h2>
+                <div id="portfolio" class="portfolio row grid-container portfolio-overlay-open no-gutters">
+                    @foreach (var prop in Model.Properties)
+                    {
+                        var type = "";
+                        @switch (prop.PropertyType)
+                        {
+                            case (int)enums.PropertyType.Chalets:
+                                type = @lang.Chalet;
+                                break;
+                            case (int)enums.PropertyType.Rest:
+                                type = @lang.Break;
+                                break;
+                            case (int)enums.PropertyType.Villa:
+                                type = @lang.Villa;
+                                break;
+                        }
+                        <article class="portfolio-item col-12 col-sm-6 col-md-4 col-lg-3 pf-media pf-icons">
+                            <div class="grid-inner">
+                                <div class="portfolio-image">
+                                    <a asp-action="Property" asp-route-id="@prop.Id" target="_blank">
+                                        <img src="@Url.Content("~/"+Domain.Properties.GetPropertyDefaultImage(context,prop.Id))" alt="Beach Activities">
+                                        <div class="bg-overlay">
+                                            <div class="bg-overlay-content dark flex-column">
+                                                <div class="portfolio-desc pt-0 center">
+                                                    <h4>
+                                                        @prop.PropertyName
+                                                    </h4>
+                                                    <h5>
+                                                        @type
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                            <div class="bg-overlay-bg dark op-ts op-05" data-hover-animate="op-1" data-hover-animate-out="op-05"></div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                    <article class="portfolio-item col-12 col-sm-6 col-md-4 col-lg-3 pf-media pf-icons">
+                        <div class="grid-inner">
+                            <div class="portfolio-image">
+                                <a asp-action="Property" target="_blank">
+                                    <img src="~/demos/real-estate/images/hero/1.jpg" alt="Beach Activities">
+                                    <div class="bg-overlay">
+                                        <div class="bg-overlay-content dark flex-column">
+                                            <div class="portfolio-desc pt-0 center">
+                                                <h4>
+                                                    <i class="icon-plus-square1"></i>
+                                                    <br />
+                                                    @lang.NewProperty
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <div class="bg-overlay-bg dark op-ts op-05" data-hover-animate="op-1" data-hover-animate-out="op-05"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>*@
+
+        </div>
+    </div>
+</section><!-- #content end -->

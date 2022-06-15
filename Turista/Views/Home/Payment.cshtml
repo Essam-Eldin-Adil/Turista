@@ -1,0 +1,238 @@
+﻿@model Turista.Models.UnitViewModel
+@{
+    ViewData["Title"] = Model.Property.PropertyName;
+    var images = Model.Property.PropertyImages.OrderBy(c => c.IsPrimary).ToList();
+    var dates = Domain.Reservation.GetCheckedDates(HttpContextAccessor.HttpContext);
+}
+
+@section css{
+    <link href="~/css/jquery-ui.min.css" rel="stylesheet" />
+
+    <link href="~/css/jquery.comiseo.daterangepicker.css" rel="stylesheet" />
+
+}
+<!-- Slider
+============================================= -->
+<!--<section id="slider" class="slider-element dark parallax include-header include-topbar" style="background-image: url('@Url.Content("~/demos/real-estate/images/single-condo.jpg")'); background-size: cover; height: 550px;" data-bottom-top="background-position:0px 200px;" data-top-bottom="background-position:0px -200px;">
+
+    <div class="container clearfix" style="z-index: 2;">
+        <div class="real-estate-info-wrap">
+            <div class="heading-block mb-0 border-bottom-0 d-md-flex d-block align-items-center justify-content-between">
+                <h2 class="mr-auto">
+                    @Model.Property.PropertyName /
+                    <span class="h5 text-info">
+                        @switch (Model.Property.PropertyType)
+                        {
+                            case 0:
+                                <span>@lang.Chalet</span>
+                                break;
+                            case 1:
+                                <span>@lang.Break</span>
+                                break;
+                            case 2:
+                                <span>@lang.Villa</span>
+                                break;
+                        }
+
+                    </span>
+
+                </h2>
+                <div class="d-flex flex-shrink-1" data-lightbox="gallery">
+                    @foreach (var item in images)
+                    {
+                        if (images.IndexOf(item) == 0)
+                        {
+                            <a href="@Url.Content(" ~ /"+item.File.FileContent)" class="button button-color button-rounded nott m-0 font-weight-medium align-self-end" data-lightbox="gallery-item"><i class="icon-picture"></i> @lang.ViewGallery</a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Content(" ~ /"+item.File.FileContent)" class="d-none" data-lightbox="gallery-item"></a>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="real-estate-price mb-md-0 mb-lg-4 mb-xl-0"><h3>@Model.Property.DayPrice@lang.Currency<span class="text-light h6">/@lang.DayPrice</span></h3></div>
+        </div>
+    </div>
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%;z-index: 1">
+        <div class="video-overlay" style="background:linear-gradient(180deg,rgba(0,0,0,.3) 0,transparent 40%,transparent 60%,rgba(0,0,0,.8));"></div>
+    </div>
+</section>--><!-- #slider end -->
+<!-- Content
+    ============================================= -->
+<section id="content">
+    <div class="content-wrap pt-0">
+
+        <div class="section mt-0" style="padding: 30px 0">
+            <div class="container clearfix">
+                <ul class="process-steps process-5 row col-mb-30 justify-content-center mb-2">
+                    <li class="col-sm-6 col-lg-1-5 pb-0 active">
+                        <a href="#" class="step i-bordered i-circled mx-auto icon-shopping-cart"></a>
+                        <h6>
+                            @lang.Choosing
+                        </h6>
+                    </li>
+                    <li class="col-sm-6 col-lg-1-5 pb-0 active">
+                        <a href="#" class="step i-bordered i-circled mx-auto icon-pencil2"></a>
+                        <h6>
+                            @lang.Audit
+                        </h6>
+                    </li>
+                    <li class="col-sm-6 col-lg-1-5 pb-0 active">
+                        <a href="#" class="step i-bordered i-circled mx-auto icon-ok"></a>
+                        <h6>@lang.Payments</h6>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container clearfix">
+
+            <div class="row gutter-40 col-mb-80">
+                <div class="postcontent col-lg-8">
+                    <form id="PaymentForm" method="post" action="~/Home/Payment">
+                        @Domain.Settings.Get(context).PaymentDescripton
+                        <p>@lang.Amount @Model.Property.DepositAmount @lang.Currency</p>
+                        <input type="hidden" name="type" value="@enums.PaymentMethod.Cash" />
+                        <input type="hidden" name="propertyId" value="@Model.Property.Id" />
+                        <input type="hidden" name="checkIn" value="@dates.CheckIn.ToString("MM/dd/yyyy")" />
+                        <input type="hidden" name="checkOut" value="@dates.CheckOut.ToString("MM/dd/yyyy")" />
+                        <button type="button" onclick="payment()" class="button button-circle">@lang._continue</button>
+                    </form>
+                </div>
+
+                <div class="sidebar sticky-sidebar-wrap col-lg-4">
+                    <div class="sidebar-widgets-wrap">
+                        <div class="sticky-sidebar">
+
+                            <div class="widget quick-contact-widget form-widget clearfix">
+
+                                <div class="card bg-light">
+
+                                    <div class="card-body">
+                                        <input id="reservedate" name="reservedate" type="hidden">
+                                        <table class="table table-bordered tableCheckin">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <strong>@lang.CheckIn</strong>
+                                                        <br>
+                                                        <span>@dates.CheckIn.ToString("dd-MM-yyyy")</span>
+                                                    </td>
+                                                    <td>
+                                                        <strong>@lang.CheckOut</strong>
+                                                        <br>
+                                                        <span>@dates.CheckOut.ToString("dd-MM-yyyy")</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <strong>@lang.DaysCount</strong>
+                                                        <br>
+                                                        <label>
+                                                            @if (dates.DaysCount == 1)
+                                                            {
+                                                                <span>@lang.OneNight</span>
+                                                            }
+                                                            else if (dates.DaysCount == 2)
+                                                            {
+                                                                <span>@lang.TowNights</span>
+                                                            }
+                                                            else if (dates.DaysCount > 2 && dates.DaysCount < 10)
+                                                            {
+                                                                <span>@dates.DaysCount @lang.Nights</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>@dates.DaysCount @lang.Night</span>
+                                                            }
+                                                        </label>
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>@lang.CheckInTime</strong>
+                                                        <br>
+                                                        <span>@Model.Property.CheckInTime</span>
+                                                    </td>
+                                                    <td>
+                                                        <strong>@lang.CheckOutTime</strong>
+                                                        <br>
+                                                        <span>@Model.Property.CheckOutTime</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        @lang.YouWillPayNow @Model.Property.DepositAmount @lang.Currency
+                                                        <br />
+                                                        <h3 class="mt-4 mb-2">@lang.InvoiceDetails</h3>
+                                                        <div class="row">
+                                                            <div class="col-8 col-md-8 col-lg-8">
+                                                                <label>
+                                                                    @if (dates.DaysCount == 1)
+                                                                    {
+                                                                        <span>@lang.OneNight</span>
+                                                                    }
+                                                                    else if (dates.DaysCount == 2)
+                                                                    {
+                                                                        <span>@lang.TowNights</span>
+                                                                    }
+                                                                    else if (dates.DaysCount > 2 && dates.DaysCount < 10)
+                                                                    {
+                                                                        <span>@dates.DaysCount @lang.Nights</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span>@dates.DaysCount @lang.Night</span>
+                                                                    }
+                                                                </label>
+                                                                X
+                                                                @Model.Property.DayPrice
+                                                            </div>
+                                                            <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                @{
+                                                                    var totalPrice = dates.DaysCount * Model.Property.DayPrice;
+                                                                }
+                                                                @totalPrice @lang.Currency
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-8 col-md-8 col-lg-8">
+                                                                <strong>
+                                                                    @lang.Total
+                                                                </strong>
+                                                            </div>
+                                                            <div class="col-4 col-md-4 col-lg-4 text-right">
+                                                                <strong>
+                                                                    @totalPrice @lang.Currency
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- .content-wrap end -->
+</section><!-- #content end -->
+<input type="hidden" id="confirmText" value="@lang.AreYouSureYouWantToBook" />
+@section js{
+    <script>
+        function payment() {
+            var confirm = window.confirm($("#confirmText").val());
+            if (confirm) {
+                $("#PaymentForm").submit();
+            }
+        }
+    </script>
+}

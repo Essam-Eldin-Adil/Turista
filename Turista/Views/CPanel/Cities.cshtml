@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = lang.CitiesManagement;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<h4>@lang.CitiesManagement</h4>
+<a href="@Url.Action("City")" class="btn btn-success btn-sm"><i class="icon-plus"></i> @lang.AddNew</a>
+
+<div class="table-responsive mt-2">
+    <table id="datatable1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>@lang.Image</th>
+                <th>@lang.CityName</th>*
+                <th></th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>@lang.Image</th>
+                <th>@lang.CityName</th>
+                <th></th>
+            </tr>
+        </tfoot>
+        <tbody></tbody>
+    </table>
+</div>
+@section js
+{
+    <script>
+        $('#datatable1').dataTable({
+            "ajax": '@Url.Action("GetCitiesData")',
+            language: lang,
+            length: true,
+            serverSide: true,
+            retrieve: true,
+            dom: 'Bfrtip',
+            columns: [
+                {
+                    "data": "imageUrl",
+                    "render": function(data, type, full, meta) {
+                        return `<img alt="@lang.Image" src="${data}" style="width: 50px;height: 50px" class="img-thumbnail mb-2">`;
+                    }
+                },
+                {
+                    "data": "cityName",
+                    "render": function(data, type, full, meta) {
+                        if (data) {
+
+                            return data;
+                        } else {
+                            return `--`;
+                        }
+                    }
+                },
+                {
+                    "data": "id",
+                    "className": "text-center w-25",
+                    "render": function(data, type, full, meta) {
+                        console.log(full);
+                        return `<a href="@Url.Action("City")/${full.id}" class="btn btn-success btn-sm"><i class="icon-edit"></i> @lang.Edit</a>
+                                    <a href="@Url.Action("RemoveCity")/${full.id}" class="btn btn-danger btn-sm"><i class="icon-trash"></i> @lang.Delete</a>`;
+                    }
+                }
+            ]
+        });
+    </script>
+}

@@ -1,0 +1,190 @@
+﻿@model Turista.Data.Properties.Property
+@{
+    var address = Model.City.CityName + ", " + Model.Region + ", " + Model.Neighborhood;
+    var offer = Domain.Reservation.getIsHasOffer(context, HttpContextAccessor.HttpContext, Model);
+    var images = Domain.Properties.GetPropertyImages(context, Model.Id);
+}
+
+
+<div class="card">
+    <div class="grid-inner row">
+        <div class="col-lg-4">
+            <div id="carousel-@Model.Id" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    @foreach (var item in images)
+                    {
+                        var index = images.IndexOf(item);
+                        if (index == 0)
+                        {
+                            <li data-target="#carousel-@Model.Id" data-slide-to="@index" class="active"></li>
+                        }
+                        else
+                        {
+                            <li data-target="#carousel-@Model.Id" data-slide-to="@index"></li>
+                        }
+                    }
+                </ol>
+                <div class="carousel-inner">
+                    @foreach (var item in images)
+                    {
+                        var index = images.IndexOf(item);
+                        if (index == 0)
+                        {
+                            <a href="~/Home/Unit/@Model.Id" class="carousel-item active">
+                                <img class="d-block w-100" style="height: 200px " src="@Url.Content("~/"+item)" alt="First slide">
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="carousel-item">
+                                <a href="@Url.Content("~/"+Domain.Properties.GetPropertyDefaultImage(context,Model.Id))" data-lightbox="image">
+
+                                    <img class="d-block w-100" style="height: 200px;" src="@Url.Content("~/"+item)" alt="Second slide">
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+                <a class="carousel-control-prev" href="#carousel-@Model.Id" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel-@Model.Id" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg col-md-8 mt-4 mt-lg-0 py-3">
+            <div class="entry-title title-sm">
+                <h4><a href="~/Home/Unit/@Model.Id">@Html.Raw(Domain.Properties.GetPropertyName(context, Model))</a></h4>
+            </div>
+            <div class="entry-meta">
+                <ul>
+                    <li><i class="icon-eye color"></i><a href="#"> @Model.Views</a></li>
+                    <li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (Model.IsFive)
+                            {
+                                <a href="javascript:void(0)" onclick="fiverate(this,'@Model.Id');" data-toggle="tooltip" title="@lang.Like"><i class="icon-heart text-danger"></i></a>
+                            }
+                            else
+                            {
+                                <a href="javascript:void(0)" onclick="fiverate(this,'@Model.Id');" data-toggle="tooltip" title="@lang.Like"><i class="icon-line-heart"></i></a>
+                            }
+                        }
+                        else
+                        {
+                            <a href="~/Accounts/Login?ReturnUrl=@Context.Request.Path" data-toggle="tooltip" title="@lang.Like"><i class="icon-line-heart"></i></a>
+                        }
+                    </li>
+                </ul>
+            </div>
+            <div class="entry-content">
+                <i class="icon-line-map"></i>
+                @if (address.Length > 30)
+                {
+                    <span style="font-size: 0.8rem;">@address.Substring(0, 30)...</span>
+                }
+                else
+                {
+                    <span style="font-size: 0.8rem;">@address</span>
+                }
+            </div>
+        </div>
+        <div class="col-lg-auto col-md-4 mt-4 mt-lg-0 py-3 text-left text-md-center">
+            <div class="hotel-price">
+                @if (offer.HasOffer)
+                {
+                    <span>
+                        @lang.Currency <del class="text-danger">@Model.DayPrice</del>
+                        @offer.Amount
+                    </span>
+                }
+                else
+                {
+                    <span>@lang.Currency @Model.DayPrice</span>
+                }
+            </div>
+            <small><em>@lang.DayPrice</em></small><br>
+            <a href="~/Home/Unit/@Model.Id" class="button button-rounded mt-4 mx-0">@lang.Details</a>
+            @if (Model.IsReserved)
+            {
+                <br />
+                <div class="label badge badge-danger">@lang.PropertyReserved</div>
+            }
+        </div>
+    </div>
+</div>
+
+@*<div class="real-estate-item-image">
+        @if (Model.IsReserved)
+        {
+            <div class="label badge badge-danger">@lang.PropertyReserved</div>
+        }
+        <a href="#">
+            <img src="~/demos/real-estate/images/items/1.jpg" alt="Image 1">
+        </a>
+        <div class="real-estate-item-price">
+            @Model.DayPrice @lang.Currency<span>@lang.DayPrice</span>
+        </div>
+        <div class="real-estate-item-info clearfix" data-lightbox="gallery">
+            <a href="~/demos/real-estate/images/items/1.jpg" data-toggle="tooltip" title="Images" data-lightbox="gallery-item"><i class="icon-line-stack-2"></i></a>
+            <a href="~/demos/real-estate/images/items/3.jpg" class="d-none" data-lightbox="gallery-item"></a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                @if (Model.IsFive)
+                {
+                    <a href="javascript:void(0)" onclick="fiverate(this,'@Model.Id');" data-toggle="tooltip" title="@lang.Like"><i class="icon-heart text-danger"></i></a>
+                }
+                else
+                {
+                    <a href="javascript:void(0)" onclick="fiverate(this,'@Model.Id');" data-toggle="tooltip" title="@lang.Like"><i class="icon-line-heart"></i></a>
+                }
+            }
+            else
+            {
+                <a href="~/Accounts/Login?refererUrl=@Context.Request.Path" data-toggle="tooltip" title="@lang.Like"><i class="icon-line-heart"></i></a>
+            }
+            <a href="~/Accounts/Login?refererUrl=@Context.Request.Path" data-toggle="tooltip" title="@lang.Reviews"><i class="icon-eye"></i> @Model.Views</a>
+        </div>
+    </div>
+
+    <div class="real-estate-item-desc p-1 mt-0 border">
+        <h5>
+            <a href="~/Home/Unit/@Model.Id">
+                @if (Model.PropertyName.Length > 30)
+                {
+                    <span>@Model.PropertyName.Substring(0, 30)...</span>
+                }
+                else
+                {
+                    <span>@Model.PropertyName</span>
+                }
+            </a>
+        </h5>
+        @if (address.Length > 30)
+        {
+            <span style="font-size: 0.8rem;">@address.Substring(0, 30)...</span>
+        }
+        else
+        {
+            <span style="font-size: 0.8rem;">@address</span>
+        }
+
+        <a href="~/Home/Unit/@Model.Id" class="real-estate-item-link"><i class="icon-info"></i></a>
+        @if (Model.ParameterValues!=null)
+        {
+            <div class="line" style="margin-top: 15px; margin-bottom: 15px;"></div>
+
+            <div class="real-estate-item-features row font-weight-medium font-primary px-3 clearfix">
+                <div class="col-lg-4 col-6 p-0">Beds: <span class="color">3</span></div>
+                <div class="col-lg-4 col-6 p-0">Baths: <span class="color">3</span></div>
+                <div class="col-lg-4 col-6 p-0">Area: <span class="color">150 sqm</span></div>
+                <div class="col-lg-4 col-6 p-0">Pool: <span class="text-success"><i class="icon-check-sign"></i></span></div>
+                <div class="col-lg-4 col-6 p-0">Internet: <span class="text-success"><i class="icon-check-sign"></i></span></div>
+                <div class="col-lg-4 col-6 p-0">Cleaning: <span class="text-danger"><i class="icon-minus-sign-alt"></i></span></div>
+            </div>
+        }
+    </div>*@

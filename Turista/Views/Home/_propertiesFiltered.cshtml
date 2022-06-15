@@ -1,0 +1,101 @@
+﻿@model Turista.Models.PropertyViewModel
+<div class="row">
+    @foreach (var item in Model.Properties)
+    {
+
+        @*<div class="real-estate-item portfolio-item mb-5 col-12 col-md-6 col-lg-4">*@
+        <div class="entry col-12 mb-3">
+
+            <partial name="propertyCard" model="@item" />
+        </div>
+    }
+</div>
+@{
+    var next = 1;
+    var prev = 1;
+    var pages = Model.TotalRecord / Model.PageSize;
+}
+@*<ul class="pagination my-0">
+        @for (int i = 1; i < pages + 1; i++)
+        {
+            if (i == pages - 2)
+            {
+                prev = Model.PageNumber - 1;
+                if (Model.PageNumber != 1)
+                {
+                    <li class="page-item"><button type="button" onclick="Search(@prev)" class="page-link" href="#">@lang.Prev</button></li>
+                }
+            }
+            if (i == Model.PageNumber)
+            {
+
+                next = i + 1;
+                <li class="page-item active"><button type="button" onclick="Search(@i)" class="page-link">@i</button></li>
+            }
+            else
+            {
+                <li class="page-item"><button type="button" onclick="Search(@i)" class="page-link">@i</button></li>
+            }
+            if (i == (pages + 1) - 1)
+            {
+                if (next > Model.TotalRecord)
+                {
+                }
+                else
+                {
+                    <li class="page-item"><button type="button" onclick="Search(@next)" class="page-link">@lang.Next</button></li>
+                }
+            }
+        }
+    </ul>*@
+
+<div class="w-100 text-center">
+    <ul class="pagination pagination-circle pagination-3d pagination-lg">
+        @for (int i = 1; i < pages + 1; i++)
+        {
+            var excludeRecord = (Model.PageSize * i) - Model.PageSize;
+            if (i == 1)
+            {
+                <li class="page-item disabled">
+                    <button type="button" class="page-link" onclick="Search(@prev)" aria-label="Previous"> <span aria-hidden="true">«</span></button>
+                </li>
+            }
+
+            if (i == Model.PageNumber)
+            {
+                next = i + 1;
+                <li class="page-item active">
+                    <button onclick="Search(@i)" class="page-link">@i</button>
+                </li>
+            }
+            else
+            {
+                <li class="page-item"><button type="button" onclick="Search(@i)" class="page-link">@i</button></li>
+            }
+
+            if (i == pages)
+            {
+                if (next <= excludeRecord)
+                {
+                    <li class="page-item"><button class="page-link" onclick="Search(@next)" aria-label="Next"><span aria-hidden="true">»</span></button></li>
+                }
+                else
+                {
+                    <li class="page-item disabled"><button class="page-link" onclick="Search(@next)" aria-label="Next"><span aria-hidden="true">»</span></button></li>
+                }
+            }
+
+        }
+    </ul>
+</div>
+@if (!Model.Properties.Any())
+{
+    <div class="text-center">
+        <div class="pt-2">
+            <i class="icon-ban" style="font-size:120px"></i>
+        </div>
+        <div class="pt-1">
+            @lang.NoSearchResult
+        </div>
+    </div>
+}

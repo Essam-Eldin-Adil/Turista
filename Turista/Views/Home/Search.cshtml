@@ -1,0 +1,578 @@
+﻿@model Turista.Models.SearchViewModel
+@section css{
+    <!-- Date & Time Picker CSS -->
+    <link rel="stylesheet" href="~/css/components/datepicker.css" type="text/css" />
+    <link rel="stylesheet" href="~/css/components/timepicker.css" type="text/css" />
+    <style>
+        .slider-element {
+            padding: 250px 0 150px;
+        }
+
+        .device-md .slider-element,
+        .device-sm .slider-element,
+        .device-xs .slider-element {
+            padding: 60px 0;
+        }
+
+        .expand-link {
+            display: none;
+        }
+
+        .more-search {
+            display: block;
+            margin-top: 10px;
+            float: right;
+            text-align: right;
+            color: #FFF;
+            cursor: pointer;
+        }
+
+        label {
+            font-family: 'Lora', sans-serif !important;
+        }
+
+        .bootstrap-select.btn-group > .dropdown-toggle {
+            background-color: #dae0e5;
+            border-color: #d3d9df;
+        }
+    </style>
+}
+<section class="py-5 border-bottom shadow">
+    <div class="container">
+        <form action="#" method="post" class="mb-0" autocomplete="off">
+            <div class="row clearfix">
+                <div class="col-md-3 col-lg-3 col-sm-6 col-12">
+                    <label for="">@lang.City</label>
+                    <select id="CityId" class="selectpicker form-control" multiple data-live-search="true" data-size="5" style="width:100%;">
+                        @*@if (Model.City.Contains(Guid.Empty))
+        {
+            <option selected value="@Guid.Empty">@lang.SeeAll</option>
+        }
+        else
+        {
+        <option value="@Guid.Empty">@lang.SeeAll</option>
+
+        }*@
+
+                        @foreach (var item in Model.Cities)
+                        {
+                            if (Model.City.Contains(item.Id))
+                            {
+                                <option selected value="@item.Id">@item.CityName</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Id">@item.CityName</option>
+                            }
+                        }
+
+                    </select>
+                </div>
+                <div class="col-md-3 col-lg-3 col-sm-6 col-12">
+                    <label for="">@lang.PropertyType</label>
+                    <select name="ProprtyType" id="propType" required="" class="selectpicker form-control" multiple data-size="6" style="width:100%; line-height: 30px;">
+                        @*@if (Model.ProprtyType.Contains((int)enums.PropertyType.All))
+                        {
+                            <option selected value="@((int)enums.PropertyType.All)">@lang.SeeAll</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)enums.PropertyType.All)">@lang.SeeAll</option>
+                        }*@
+                        @if (Model.ProprtyType.Contains((int)enums.PropertyType.Chalets))
+                        {
+                            <option selected value="@((int)enums.PropertyType.Chalets)">@lang.Chalets</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)enums.PropertyType.Chalets)">@lang.Chalets</option>
+                        }
+
+                        @if (Model.ProprtyType.Contains((int)enums.PropertyType.Rest))
+                        {
+                            <option selected value="@((int)enums.PropertyType.Rest)">@lang.Break</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)enums.PropertyType.Rest)">@lang.Break</option>
+                        }
+
+                        @if (Model.ProprtyType.Contains((int)enums.PropertyType.Villa))
+                        {
+                            <option selected value="@((int)enums.PropertyType.Villa)">@lang.Villa</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)enums.PropertyType.Villa)">@lang.Villa</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg-4 col-sm-6 col-12">
+                    <label for="">@lang.Date <span style="font-size:14px" id="dateDesc"></span></label>
+                    <div>
+                        <input type="text" class="form-control" value="@Model.DateFrom?.ToString("MM/dd/yyyy") - @Model.DateTo?.ToString("MM/dd/yyyy")" id="dateInput" placeholder="@lang.DateFormat-@lang.DateFormat">
+                        <input type="hidden" value="@DateTime.Now.ToString("MM/dd/yyyy")" id="dateCheckIn" name="dateCheckIn">
+                        <input type="hidden" value="@DateTime.Now.AddDays(1).ToString("MM/dd/yyyy")" id="dateCheckOut" name="dateCheckOut">
+                    </div>
+                </div>
+
+                <div class="col-auto clearfix">
+                    <label for="">&ensp;</label>
+                    <button class="button button-3d button-rounded btn-block m-0" type="button" onclick="Search()" style=""><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</section>
+
+
+<!-- Slider
+============================================= -->
+<!--<section id="slider" class="slider-element include-header include-topbar" style="background: url('@Url.Content("~/demos/real-estate/images/items/page-title.jpg")') center center no-repeat; background-size: cover; overflow: visible;">
+    <div class="container" style="z-index: 2">
+        <div class="tabs advanced-real-estate-tabs">
+            <div class="tab-container">
+                <div class="tab-content clearfix" id="tab-properties">
+                    <form action="#" method="post" class="mb-0" autocomplete="off">
+                        <div class="row clearfix">
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-12">
+                                <label for="">@lang.City</label>
+                                <select id="CityId" class="selectpicker form-control" multiple data-live-search="true" data-size="5" style="width:100%;">
+                                    @if (Model.City.Contains(Guid.Empty))
+                                    {
+                                        <option selected value="@Guid.Empty">@lang.SeeAll</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@Guid.Empty">@lang.SeeAll</option>
+                                    }
+                                    @foreach (var item in Model.Cities)
+                                    {
+                                        if (Model.City.Contains(item.Id))
+                                        {
+                                            <option selected value="@item.Id">@item.CityName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.CityName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-12">
+                                <label for="">@lang.PropertyType</label>
+                                <select name="ProprtyType" id="propType" required="" class="selectpicker form-control" multiple data-size="6" style="width:100%; line-height: 30px;">
+                                    @if (Model.ProprtyType.Contains((int)enums.PropertyType.All))
+                                    {
+                                        <option selected value="@((int)enums.PropertyType.All)">@lang.SeeAll</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)enums.PropertyType.All)">@lang.SeeAll</option>
+                                    }
+                                    @if (Model.ProprtyType.Contains((int)enums.PropertyType.Chalets))
+                                    {
+                                        <option selected value="@((int)enums.PropertyType.Chalets)">@lang.Chalets</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)enums.PropertyType.Chalets)">@lang.Chalets</option>
+                                    }
+
+                                    @if (Model.ProprtyType.Contains((int)enums.PropertyType.Rest))
+                                    {
+                                        <option selected value="@((int)enums.PropertyType.Rest)">@lang.Break</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)enums.PropertyType.Rest)">@lang.Break</option>
+                                    }
+
+                                    @if (Model.ProprtyType.Contains((int)enums.PropertyType.Villa))
+                                    {
+                                        <option selected value="@((int)enums.PropertyType.Villa)">@lang.Villa</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)enums.PropertyType.Villa)">@lang.Villa</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-12">
+                                <label for="">@lang.Date</label>
+                                <div class="input-daterange component-datepicker input-group">
+                                    <input type="text" value="@Model.DateFrom" id="dateCheckIn" name="dateCheckIn" class="form-control text-left" placeholder="@lang.DateFormat">
+                                    <div class="input-group-prepend"><div class="input-group-text">@lang.to</div></div>
+                                    <input type="text" value="@Model.DateTo" id="dateCheckOut" name="dateCheckOut" class="form-control text-left" placeholder="@lang.DateFormat">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-3 clearfix">
+                                <button class="button button-3d button-rounded btn-block m-0" type="button" onclick="Search()" style="margin-top: 35px !important;">@lang.Search</button>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+
+                        <div class="expand-link">
+                            <div class="row justify-content-between mt-3">
+                                <div class="col-md-4 col-sm-6 col-12">
+                                    <label for="" style="margin-bottom:20px !important;">@lang.Price</label>
+                                    <input class="price-range-slider" name="price" id="price" />
+                                </div>
+                                <div class="clear d-xl-none d-lg-none d-md-none d-sm-none bottommargin-sm"></div>
+                                <div class="col-md-4 col-sm-6 col-12">
+                                </div>
+                                <div class="col-md-2 col-sm-6 bottommargin-sm">
+                                </div>
+                                <div class="col-md-2 col-sm-6 bottommargin-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <span class="more-search"><i class="icon-line-plus"></i> @lang.AdvancedSearch</span>
+        </div>
+    </div>
+    <div class="video-wrap" style="position: absolute; top: 0; left: 0; height: 100%; z-index:1;">
+        <div class="video-overlay" style="background: rgba(0,0,0,0.3); z-index: 1;"></div>
+    </div>
+
+</section>-->
+<!-- #slider end -->
+<!-- Content
+        ============================================= -->
+<div id="content">
+    <div class="content-wrap pt-0">
+        <div class="section bg-transparent m-0 clearfix">
+            <div class="container clearfix">
+                <div class="row justify-content-between">
+                    <div class="col-12 col-md-4">
+                        <button type="button" onclick="openListView()" id="listBtn" class="btn text-white bg-color px-4"><i class="icon-line2-list"></i> @lang.List</button>
+                    </div>
+                    <div class="col-12 col-md-8 text-right">
+                        <div class="btn-group">
+                            <div class="dropdown">
+                                <button class="btn btn-light dropdown-toggle" type="button" id="sortingBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@lang.PopularListed:@lang.AllListing</button>
+                                <div class="dropdown-menu" aria-labelledby="sortingBtn">
+                                    <button onclick="bindSorting('@lang.AllListing',@((int)enums.SortingList.AllListing))" class="dropdown-item" type="button">@lang.AllListing</button>
+                                    <button onclick="bindSorting('@lang.ReviewListing',@((int)enums.SortingList.ReviewListing))" class="dropdown-item" type="button">@lang.ReviewListing</button>
+                                    <button onclick="bindSorting('@lang.LocationListing',@((int)enums.SortingList.LocationListing))" class="dropdown-item" type="button">@lang.LocationListing</button>
+                                    <button onclick="bindSorting('@lang.ViewedListing',@((int)enums.SortingList.ViewedListing))" class="dropdown-item" type="button">@lang.ViewedListing</button>
+                                    <button onclick="bindSorting('@lang.AZ_Listed',@((int)enums.SortingList.AZ_Listed))" class="dropdown-item" type="button">@lang.AZ_Listed</button>
+                                    <button onclick="bindSorting('@lang.PriceLowestFirst',@((int)enums.SortingList.PriceLowestFirst))" class="dropdown-item" type="button">@lang.PriceLowestFirst</button>
+                                    <button onclick="bindSorting('@lang.PriceHighestFirst',@((int)enums.SortingList.PriceHighestFirst))" class="dropdown-item" type="button">@lang.PriceHighestFirst</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-3 col-lg-3">
+                        <form id="advanceSearch" class="mt-5">
+                            <div>
+                                <input type="hidden" name="parameters" id="parameters" />
+                                <input type="hidden" name="inputIds" id="inputIds" />
+                                <input type="hidden" name="inputValues" id="inputValues" />
+                                <input type="hidden" name="sorting" id="hdSorting" />
+                                <input type="hidden" name="PriceFrom" value="1" />
+                                <input type="hidden" name="PriceTo" value="100000" />
+                                <div class="toggle toggle-border bg-light mt-3">
+                                    <div class="toggle-header">
+
+                                        <div class="toggle-title">
+                                            <h5 class="m-0 mb-2">@lang.AdvancedSearch</h5>
+                                        </div>
+                                        <div class="toggle-icon">
+                                            <i class="toggle-closed icon-line-plus"></i>
+                                            <i class="toggle-open icon-realestate-building"></i>
+                                            <i class="toggle-open icon-line-minus"></i>
+                                        </div>
+                                    </div>
+                                    <div class="toggle-content row">
+                                        <div class="form-group col-12">
+                                            <label for="propertyName">@lang.PropertyName:</label>
+                                            <input type="text" name="propertyName" id="propertyName" class="form-control required" value="" placeholder="@lang.PropertyName">
+                                        </div>
+                                        <div class="form-group col-12">
+                                            <label for="NeighborhoodName">@lang.NeighborhoodName:</label>
+                                            <input type="text" name="neighborhoodName" id="NeighborhoodName" class="form-control required" value="" placeholder="@lang.NeighborhoodName">
+                                        </div>
+
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="Directions">@lang.Directions:</label>
+                                            <select name="directions" class="form-control" style="width:100%; line-height: 30px;">
+                                                <option value="0">@lang.AllListing</option>
+                                                <option value="@((int)enums.Direction.West)">@lang.West</option>
+                                                <option value="@((int)enums.Direction.South)">@lang.South</option>
+                                                <option value="@((int)enums.Direction.East)">@lang.East</option>
+                                                <option value="@((int)enums.Direction.North)">@lang.North</option>
+                                                <option value="@((int)enums.Direction.Southeast)">@lang.Southeast</option>
+                                                <option value="@((int)enums.Direction.Southwest)">@lang.Southwest</option>
+                                                <option value="@((int)enums.Direction.Northeast)">@lang.Northeast</option>
+                                                <option value="@((int)enums.Direction.NorthWest)">@lang.NorthWest</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="UnitCode">@lang.UnitCode:</label>
+                                            <input type="text" name="unitCode" id="UnitCode" class="form-control required" value="" placeholder="@lang.UnitCode">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*@foreach (var param in Model.ParameterGroups)
+        {
+            <div class="toggle toggle-border bg-light mt-3">
+                <div class="toggle-header">
+
+                    <div class="toggle-title">
+                        <h5 class="m-0">@param.Name</h5>
+                    </div>
+                    <div class="toggle-icon">
+                        <i class="toggle-closed icon-line-plus"></i>
+                        <i class="toggle-open @param.Icon"></i>
+                        <i class="toggle-open icon-line-minus"></i>
+                    </div>
+                </div>
+                <div class="toggle-content">
+                    @foreach (var item in param.Parameters.Where(c => c.Type == (int)Turista.Models.enums.ParameterType.Checkbox))
+                    {
+                        <div>
+                            <input id="checkbox-@item.Id" value="@item.Id" class="checkbox-style" name="paramCheck[]" type="checkbox">
+                            <label for="checkbox-@item.Id" class="checkbox-style-2-label checkbox-small"> @item.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        }*@
+                        <div class="toggle toggle-border bg-light mt-3">
+                            <div class="toggle-header">
+
+                                <div class="toggle-title">
+                                    <h5 class="m-0">@lang.Price</h5>
+                                </div>
+                                <div class="toggle-icon">
+                                    <i class="toggle-closed icon-line-plus"></i>
+                                    <i class="toggle-open icon-line-minus"></i>
+                                </div>
+                            </div>
+                            <div class="toggle-content">
+                                <div class="row justify-content-between mt-3">
+                                    <div class="col-12">
+                                        <input class="price-range-slider" name="price" id="price" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="toggle toggle-border bg-light mt-3">
+                                <div class="toggle-header">
+
+                                    <div class="toggle-title">
+                                        <h5 class="m-0">@lang.Services</h5>
+                                    </div>
+                                    <div class="toggle-icon">
+                                        <i class="toggle-closed icon-line-plus"></i>
+                                        <i class="toggle-open icon-line-minus"></i>
+                                    </div>
+                                </div>
+                                <div class="toggle-content">
+                                    @foreach (var param in Model.ParameterGroups) { 
+                                        foreach (var item in param.Parameters.Where(c => c.Type == (int)Turista.Models.enums.ParameterType.Checkbox))
+                                        {
+                                            <div>
+                                                <input id="checkbox-@item.Id" value="@item.Id" class="checkbox-style" name="paramCheck[]" type="checkbox">
+                                                <label for="checkbox-@item.Id" class="checkbox-style-2-label checkbox-small"> @item.Name</label>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-12 col-md-9 col-lg-9">
+                        <div id="listView">
+                            <div id="propertiesContent" class="real-estate mt-5 portfolio gutter-20 col-mb-50">
+                            </div>
+                        </div>
+                        <div id="mapView" style="display:none">
+                            <div class="mt-5">
+                                Test
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- .content-wrap end -->
+</div><!-- #content end -->
+
+
+@section js{
+    <script src="~/js/components/timepicker.js"></script>
+    <script src="~/js/components/datepicker.js"></script>
+    <script>
+
+        jQuery(document).ready(function () {
+
+            $(".price-range-slider").ionRangeSlider({
+                type: "double",
+                min: 0,
+                max: 2000,
+                
+                max_postfix: " @lang.Currency ",
+                min_postfix: " @lang.Currency "
+            });
+        });
+        $('.component-datepicker.input-daterange').datepicker({
+            autoclose: true
+        });
+        function openListView() {
+            $("#listBtn").addClass("text-white bg-color").removeClass("btn-light");
+            $("#mapBtn").removeClass("text-white bg-color").addClass("btn-light");
+            $("#mapView").fadeOut(100);
+            $("#listView").fadeIn(100);
+        }
+
+        function openMapView() {
+            $("#listBtn").removeClass("text-white bg-color").addClass("btn-light");
+            $("#mapBtn").addClass("text-white bg-color").removeClass("btn-light");
+            $("#mapView").fadeIn(100);
+            $("#listView").fadeOut(100);
+        }
+
+        function bindSorting(btnText, value) {
+            $('#sortingBtn').html('@lang.PopularListed:' + btnText);
+            $("#hdSorting").val(value);
+            Search(1);
+        }
+        Search(1);
+
+        $("select").on("change", function () {
+            Search(1);
+        });
+        $("input").on("change", function () {
+            Search(1);
+        });
+        function Search(pageNumber) {
+            var params = '';
+            var inputValues = '';
+            var inputIds = '';
+            $("input[name='paramCheck[]']").each(function (index, element) {
+                if (this.checked) {
+                    params += $(this).val() + ",";
+                }
+            });
+
+            $("input[name='inputValues[]']").each(function (index, element) {
+                inputValues += $(this).val() + ",";
+            });
+            $("input[name='inputIds[]']").each(function (index, element) {
+                inputIds += $(this).val() + ",";
+            });
+            //$("input[name='propType[]']").each(function (index, element) {
+            //    if (this.checked) {
+            //        propType += $(this).val() + ",";
+            //    }
+            //});
+            var dateCheckIn = $("#dateCheckIn").val();
+            var dateCheckOut = $("#dateCheckOut").val();
+            var CityId = $("#CityId").val();
+            var propType = $("#propType").val();
+            $("#parameters").val(params);
+            $("#inputValues").val(inputValues);
+            $("#inputIds").val(inputIds);
+            var data = $('#advanceSearch').serialize();
+            var price = $("#price").val();
+            $.ajax({
+                url: '@Url.Action("SearchProperty")',
+                type: "GET",
+                dataType: "html",
+                async: true,
+                data: data + "&dateCheckIn=" + dateCheckIn + "&dateCheckOut=" + dateCheckOut + "&CityId=" + CityId + "&propType=" + propType + "&price=" + price + "&pageNumber=" + pageNumber + "&offers=false"
+            }).then(function (content) {
+                $("#propertiesContent").html(content).css('height', 'auto');
+            });
+        }
+
+
+        $('#CityId').on('change', function () {
+                var thisObj = $(this);
+                var isAllSelected = thisObj.find('option[value="@Guid.Empty"]').prop('selected');
+                var lastAllSelected = $(this).data('all');
+                var selectedOptions = (thisObj.val()) ? thisObj.val() : [];
+                var allOptionsLength = thisObj.find('option[value!="@Guid.Empty"]').length;
+
+                console.log(selectedOptions);
+                var selectedOptionsLength = selectedOptions.length;
+
+                if (isAllSelected == lastAllSelected) {
+
+                    if ($.inArray("@Guid.Empty", selectedOptions) >= 0) {
+                        selectedOptionsLength -= 1;
+                    }
+
+                    if (allOptionsLength <= selectedOptionsLength) {
+
+                        thisObj.find('option[value="@Guid.Empty"]').prop('selected', true).parent().selectpicker('refresh');
+                        isAllSelected = true;
+                    } else {
+                        thisObj.find('option[value="@Guid.Empty"]').prop('selected', false).parent().selectpicker('refresh');
+                        isAllSelected = false;
+                    }
+
+                } else {
+                    thisObj.find('option').prop('selected', isAllSelected).parent().selectpicker('refresh');
+                }
+
+                $(this).data('all', isAllSelected);
+        }).trigger('change');
+
+                    $('#propType').on('change', function () {
+                var thisObj = $(this);
+                var isAllSelected = thisObj.find('option[value="@((int)enums.PropertyType.All)"]').prop('selected');
+                var lastAllSelected = $(this).data('all');
+                var selectedOptions = (thisObj.val()) ? thisObj.val() : [];
+                var allOptionsLength = thisObj.find('option[value!="@((int)enums.PropertyType.All)"]').length;
+
+                console.log(isAllSelected);
+                var selectedOptionsLength = selectedOptions.length;
+
+                if (isAllSelected == lastAllSelected) {
+
+                    if ($.inArray("@((int)enums.PropertyType.All)", selectedOptions) >= 0) {
+                        selectedOptionsLength -= 1;
+                    }
+
+                    if (allOptionsLength <= selectedOptionsLength) {
+
+                        thisObj.find('option[value="@((int)enums.PropertyType.All)"]').prop('selected', true).parent().selectpicker('refresh');
+                        isAllSelected = true;
+                    } else {
+                        thisObj.find('option[value="@((int)enums.PropertyType.All)"]').prop('selected', false).parent().selectpicker('refresh');
+                        isAllSelected = false;
+                    }
+
+                } else {
+                    thisObj.find('option').prop('selected', isAllSelected).parent().selectpicker('refresh');
+                }
+
+                $(this).data('all', isAllSelected);
+            }).trigger('change');
+        $('#dateInput').daterangepicker({
+        "showDropdowns": true,
+        "minYear": @DateTime.Now.Year,
+        "maxYear": @DateTime.Now.AddYears(1).Year,
+        "startDate": "@DateTime.Now.ToString("MM/dd/yyyy")",
+        "endDate": "@DateTime.Now.AddDays(1).ToString("MM/dd/yyyy")",
+        "minDate": "@DateTime.Now.ToString("MM/dd/yyyy")",
+        "drops": "auto",
+        "applyButtonClasses": "btn-success"
+    }, function (start, end, label) {
+        $("#dateCheckIn").val(start.format('MM/DD/YYYY'));
+        $("#dateCheckOut").val(end.format('MM/DD/YYYY'));
+        $("#dateDesc").html('(<span class="text-primary">من</span> ' + new Date(start.format('MM/DD/YYYY')).toLocaleDateString('ar-EG', options) + '<span class="text-primary"> إلى </span> ' + new Date(end.format('MM/DD/YYYY')).toLocaleDateString('ar-EG', options)+')');
+    });
+    </script>
+}

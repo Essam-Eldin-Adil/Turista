@@ -1,0 +1,13 @@
+﻿@model Turista.Data.Identity.User
+<input type="hidden" id="phoneNumber" value="@Model.PhoneNumber" />
+<div class="text-danger col-12" id="error"></div>
+<div class="text-success col-12" id="success"></div>
+<div class="col-12 form-group">
+    <p class="mb-1">@lang.OTPDescrip</p>
+    <label for="realestate-enquiry-otp">@lang.OTP:</label><br />
+    <input type="number" id="otp" onkeypress="otpPressed(this)" max="6" placeholder="123-456" class="form-control required">
+    <button class="btn btn-link float-left" onclick="ResendOtp()" id="resendbtn" type="button">@lang.ResendOtp</button>
+</div>
+<div class="col-12 form-group">
+    <button class="button button-3d button-black m-0" onclick="CheckOtp()" type="button" id="login-button" name="login-form-submit">@lang.Login</button>
+</div>

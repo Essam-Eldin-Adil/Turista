@@ -1,0 +1,242 @@
+﻿@model Turista.Models.CheckedDates
+@{ 
+    var dates = Domain.Reservation.GetCheckedDates(HttpContextAccessor.HttpContext);
+    var offers = Domain.Reservation.getPropertyOfferWithoutCalc(context, Model.Property, dates.CheckIn, dates.CheckOut);
+    var offersSum = Domain.Reservation.getPropertyOffer(context, Model.Property, dates.CheckIn, dates.CheckOut);
+}
+<tbody>
+    <tr>
+        <td class="h4" colspan="2">
+            @if (offers.Any(c => c.Date.Date == dates.CheckIn.Date))
+            {
+                <del class="text-smaller text-danger">
+                    @Model.Property.DayPrice @lang.Currency
+                </del><br />
+                <strong> @offers.FirstOrDefault(c => c.Date.Date == dates.CheckIn.Date).Amount @lang.Currency</strong>
+            }
+            else
+            {
+                <span>@Model.Property.DayPrice @lang.Currency</span>
+            }
+            <span class="h6">/@lang.Night</span>
+        </td>
+    </tr>
+    @if (Model.Property.IsDayPrice && Model.Property.PricePerDays != null)
+    {
+        <tr>
+            <th colspan="2">@lang.PricePerDays</th>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+
+                        @lang.Saturday
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @Model.Property.PricePerDays.Saturday @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+
+                        @lang.Sunday
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @Model.Property.PricePerDays.Sunday @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+
+                        @lang.Monday
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @Model.Property.PricePerDays.Monday @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+
+                        @lang.Tuesday
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @Model.Property.PricePerDays.Tuesday @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+
+                        @lang.Wednesday
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @Model.Property.PricePerDays.Wednesday @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+
+                        @lang.Thursday
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @Model.Property.PricePerDays.Thursday @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+
+                        @lang.Friday
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @Model.Property.PricePerDays.Friday @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+    <tr>
+        <td>
+            <strong>@lang.CheckIn</strong>
+            <br>
+            <span>@Model.CheckIn.ToString("dd-MM-yyyy")</span>
+        </td>
+        <td>
+            <strong>@lang.CheckOut</strong>
+            <br>
+            <span>@Model.CheckOut.ToString("dd-MM-yyyy")</span>
+            <i onclick='$("#reservedate").daterangepicker("open");' class="cursorChecInOutChange">
+                <i class="" data-fa-i2svg="">
+                    <svg class="svg-inline--fa fa-chevron-down fa-w-14" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
+                        <path fill="currentColor" d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"></path>
+                    </svg>
+                </i>
+            </i>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <strong>@lang.DaysCount</strong>
+            <br>
+            <label>
+                @if (Model.DaysCount == 1)
+                {
+                    <span>@lang.OneNight</span>
+                }
+                else if (Model.DaysCount == 2)
+                {
+                    <span>@lang.TowNights</span>
+                }
+                else if (Model.DaysCount > 2 && Model.DaysCount < 10)
+                {
+                    <span>@Model.DaysCount @lang.Nights</span>
+                }
+                else
+                {
+                    <span>@Model.DaysCount @lang.Night</span>
+                }
+            </label>
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>@lang.CheckInTime</strong>
+            <br>
+            <span>@Model.Property.CheckInTime</span>
+        </td>
+        <td>
+            <strong>@lang.CheckOutTime</strong>
+            <br>
+            <span>@Model.Property.CheckOutTime</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            @if (Model.Property.IsReserved)
+            {
+                <button onclick='$("#reservedate").daterangepicker("open");' type="button" class="btn btn-success button-rounded w-100">@lang.PropertyReservedSelectAnotherDate</button>
+            }
+            else
+            {
+                <a href="@Url.Action("Reserve", "Home", new { id = Model.Property.Id })" class="btn btn-success button-rounded w-100">@lang.Reserve</a>
+            }
+            <div class="text-center">
+                @lang.YouWillPayNow @Model.Property.DepositAmount @lang.Currency
+            </div>
+            <br />
+            <h3 class="mt-4 mb-2">@lang.InvoiceDetails</h3>
+            <div class="row">
+                <div class="col-8 col-md-8 col-lg-8">
+                    @Model.Property.DayPrice
+                    &Chi;
+                    <label>
+                        @if (dates.DaysCount == 1)
+                        {
+                            <span>@lang.OneNight</span>
+                        }
+                        else if (dates.DaysCount == 2)
+                        {
+                            <span>@lang.TowNights</span>
+                        }
+                        else if (dates.DaysCount > 2 && dates.DaysCount < 10)
+                        {
+                            <span>@dates.DaysCount @lang.Nights</span>
+                        }
+                        else
+                        {
+                            <span>@dates.DaysCount @lang.Night</span>
+                        }
+                    </label>
+                </div>
+                <div class="col-4 col-md-4 col-lg-4 text-right">
+                    @{
+                        var totalPrice = Model.DaysCount * Model.Property.DayPrice;
+                    }
+                    @totalPrice @lang.Currency
+                </div>
+            </div>
+            @if (offersSum.Sum(c => c.Amount) > 0)
+            {
+                <div class="row">
+                    <div class="col-8 col-md-8 col-lg-8">
+                        <strong>
+                            @lang.DiscountFromOffers
+                        </strong>
+                    </div>
+                    <div class="col-4 col-md-4 col-lg-4 text-right">
+                        <strong>
+                            @offersSum.Sum(c => c.Amount) @lang.Currency
+                        </strong>
+                    </div>
+                </div>
+            }
+            <div class="row">
+                <div class="col-8 col-md-8 col-lg-8">
+                    <strong>
+                        @lang.Total
+                    </strong>
+                </div>
+                <div class="col-4 col-md-4 col-lg-4 text-right">
+                    <strong>
+                        @totalPrice @lang.Currency
+                    </strong>
+                </div>
+            </div>
+
+        </td>
+    </tr>
+</tbody>

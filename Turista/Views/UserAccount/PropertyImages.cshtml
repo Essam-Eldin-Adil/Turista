@@ -1,0 +1,101 @@
+﻿@model Turista.Data.Properties.Property
+@{
+    ViewData["Title"] = lang.PropertyImages;
+    Layout = "~/Views/Shared/_LayoutPropertyUser.cshtml";
+}
+<section id="content">
+    <div class="content-wrap p-0 mt-5">
+        <div class="container clearfix">
+            <div id="side-navigation" class="row">
+                <div class="col-md-6 col-lg-4">
+                    <partial name="_menu" model="Model" />
+                </div>
+                <div class="col-md-6 col-lg-8">
+                    <div id="propertyImages">
+                        <div class="heading-block border-0">
+                            <h3>@ViewBag.Title</h3>
+                            @if (!string.IsNullOrEmpty(Model.PropertyName))
+                            {
+                                <span>@Model.PropertyName</span>
+                            }
+                        </div>
+                        @if (Model.PropertyImages.Any())
+                        {
+                            <div class="masonry-thumbs grid-container grid-5 has-init-isotope">
+                                @foreach (var img in Model.PropertyImages.OrderByDescending(c => c.IsPrimary))
+                                {
+                                    var item = "";
+                                    @if (img.IsPrimary)
+                                    {
+                                        item = "grid-item-big";
+                                    }
+                                    <div class="grid-item @item" data-lightbox="gallery-item">
+                                        <img class="op-ts h-op-09" src="@Url.Content("~/" + Domain.File.GetImage(context, img.FileId))" />
+                                        <div class="bg-overlay">
+                                            <div class="bg-overlay-content dark" data-hover-animate="fadeIn">
+                                                <a href="@Url.Content("~/" + Domain.File.GetImage(context, img.FileId))" class="overlay-trigger-icon bg-light text-dark" data-hover-animate="fadeInDownSmall" data-hover-animate-out="fadeOutUpSmall" data-hover-speed="350" data-lightbox="image"><i class="icon-line-zoom-in"></i></a>
+                                                @if (!img.IsPrimary)
+                                                {
+                                                    <button type="button" onclick="setImageDefault('@img.FileId')" class="overlay-trigger-icon bg-light text-dark" data-hover-animate="fadeInDownSmall" data-hover-animate-out="fadeOutUpSmall" data-hover-speed="350"><i class="icon-line-box"></i></button>
+                                                }
+                                                <button type="button" onclick="removeImage('@img.FileId')" class="overlay-trigger-icon bg-light text-dark" data-hover-animate="fadeInDownSmall" data-hover-animate-out="fadeOutUpSmall" data-hover-speed="350"><i class="icon-line2-trash"></i></button>
+                                            </div>
+                                            <div class="bg-overlay-bg dark" data-hover-animate="fadeIn"></div>
+                                        </div>
+
+                                    </div>
+                                }
+                            </div>
+                        }
+
+
+                        <form method="post" asp-action="AddPropertyImage" enctype="multipart/form-data">
+                            <input type="hidden" name="propertyId" value="@Model.Id" />
+                            <div class="form-group bottommargin mt-3">
+                                <input id="input-3" name="formFiles[]" type="file" class="file" multiple data-show-upload="false" data-show-caption="true" data-show-preview="true">
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="@lang.Save" class="btn btn-primary" />
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<form method="post" id="removeForm" asp-action="RemovePropertyImage">
+    <input type="hidden" id="imgId" name="id" />
+    <input type="hidden" value="@Model.Id" name="propertyId" />
+</form>
+
+<form method="post" id="setDefaultForm" asp-action="SetDefaultPropertyImage">
+    <input type="hidden" id="imgDefId" name="id" />
+    <input type="hidden" value="@Model.Id" name="propertyId" />
+</form>
+@section js{
+    <script>
+        $("#propImg").addClass("ui-tabs-active ui-state-active");
+
+        function removeImage(id) {
+            var confirm = window.confirm('@Html.Raw(lang.AreYouSureYouWantToSave)');
+            if (confirm) {
+                $("#imgId").val(id);
+                $("#removeForm").submit();
+            }
+
+        }
+
+        function setImageDefault(id) {
+            var confirm = window.confirm('@Html.Raw(lang.AreYouSureYouWantToSave)');
+            if (confirm) {
+                $("#imgDefId").val(id);
+                $("#setDefaultForm").submit();
+            }
+
+        }
+
+    </script>
+}

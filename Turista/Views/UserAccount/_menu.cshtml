@@ -1,0 +1,12 @@
+﻿@model Turista.Data.Properties.Property
+<ul class="sidenav">
+    <li id="propInfo"><a asp-action="Property" asp-route-id="@Model.Id"><i class="icon-hotel"></i>@lang.PropertyInfo<i class="icon-chevron-right"></i></a></li>
+    @if (Model.Id != Guid.Empty)
+    {
+        <li id="propUtil"><a asp-action="PropertyUtilities" asp-route-id="@Model.Id"><i class="icon-wifi"></i>@lang.UtitiltiesAndServices<i class="icon-chevron-right"></i></a></li>
+        <li id="propImg"><a asp-action="PropertyImages" asp-route-id="@Model.Id"><i class="icon-image"></i>@lang.PropertyImages<i class="icon-chevron-right"></i></a></li>
+        <li id="propUsr"><a asp-action="PropertyUsers" asp-route-id="@Model.Id"><i class="icon-users-cog"></i>@lang.ContactInfo<i class="icon-chevron-right"></i></a></li>
+        <li id="propOffer"><a asp-action="Offers" asp-route-id="@Model.Id"><i class="icon-umbrella-beach"></i>@lang.TheOffers<i class="icon-chevron-right"></i></a></li>
+        <li id="propReserve"><a asp-action="Reservations" asp-route-id="@Model.Id"><i class="icon-ticket-alt"></i>@lang.TheReservations<i class="icon-chevron-right"></i></a></li>
+    }
+</ul>
